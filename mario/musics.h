@@ -134,18 +134,20 @@ static music mario_theme = {
 
 
 static const note teste_notes[] = {
-    NOTE(440, 0.10),
-    NOTE(440, 0.10),
-    NOTE(440, 0.10),
-    NOTE(440, 0.10)
+    NOTE(E5, 0.10), NOTE_SILENCE(0.05),
+    NOTE(E5, 0.10), NOTE_SILENCE(0.20),
+    NOTE(E5, 0.10), NOTE_SILENCE(0.05),
+    NOTE(E5, 0.10), NOTE_SILENCE(0.20),
 };
 
 static music teste_theme = {
     .notes = teste_notes,
-    .size = 4
+    .size = 8
 };
 
-static const note new_mario = {
+static const note new_mario[] = {
     NOTE(E5, 0.10), NOTE_SILENCE(0.05),
     NOTE(E5, 0.10), NOTE_SILENCE(0.20),
-}
+    NOTE(E5, 0.10), NOTE_SILENCE(0.05),
+    NOTE(E5, 0.10), NOTE_SILENCE(0.20),
+};

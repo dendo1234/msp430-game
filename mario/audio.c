@@ -1,13 +1,16 @@
 #include "audio.h"
 #include "musics.h"
 
-#include "msp430f5529.h"
+#include <msp430f5529.h>
 
-channel_data audio_data_ref;
+audio_data audio_data_ref;
 
+// Uses TA1, channels 0 and 1
+// P2.0 output 1
+// P2.4 output 2
 void audio_data_init() {
     // Channel ONE
-    TA1CTL = TASSEL__SMCLK | MC__UP | ID_0 | TAIE | TACLR;
+    TA1CTL = TASSEL__SMCLK | MC__UP | ID_0 | TACLR;
     TA1CCTL0 = CCIE;
     TA1CCTL1 = OUTMOD_3;
 
@@ -15,17 +18,17 @@ void audio_data_init() {
     P2SEL |= BIT0;
 
     // Channel TWO
-    TA2CTL = TASSEL__SMCLK | MC__UP | ID_0 | TAIE | TACLR;
+    TA2CTL = TASSEL__SMCLK | MC__UP | ID_0 | TACLR;
     TA2CCTL0 = CCIE;
     TA2CCTL1 = OUTMOD_3;
 
-    // P2DIR |= BIT4;
-    // P2SEL |= BIT4;
+    P2DIR |= BIT4;
+    P2SEL |= BIT4;
 
 
-    audio_data_ref.music_current = mario_theme;
-    audio_data_ref.note_index = 0;
-    audio_data_ref.note_repetitions = 0;
+    audio_data_ref.one.music_current = mario_theme;
+    audio_data_ref.one.note_index = 0;
+    audio_data_ref.one.note_repetitions = 0;
 }
 
 void audio_channel_tone_set(channel_index index, useconds wave_lenght) {
@@ -42,26 +45,37 @@ void audio_channel_tone_set(channel_index index, useconds wave_lenght) {
     }
 }
 
+void audio_channel_music_set(channel_index index, music *music) {
+    switch (index) {
+        case ONE:
+        audio_data_ref.one.music_current = *music;
+        case TWO:
+        audio_data_ref.two.music_current = *music;
+    }
+}
+
 #pragma vector = TIMER1_A0_VECTOR
 __interrupt void audio_channel_1_ISR() {
-    audio_data_ref.note_repetitions++;
-    if (audio_data_ref.note_repetitions >= audio_data_ref.music_current.notes[audio_data_ref.note_index].repetitions) {
-        audio_data_ref.note_repetitions = 0;
-        audio_data_ref.note_index = audio_data_ref.note_index + 1 >= audio_data_ref.music_current.size ? 0 : audio_data_ref.note_index + 1;
-        audio_channel_tone_set(ONE, audio_data_ref.music_current.notes[audio_data_ref.note_index].wave_lenght);
+    channel_data* channel = &audio_data_ref.one;
+    channel->note_repetitions++;
+    if (channel->note_repetitions >= channel->music_current.notes[channel->note_index].repetitions) {
+        channel->note_repetitions = 0;
+        channel->note_index = channel->note_index + 1 >= channel->music_current.size ? 0 : channel->note_index + 1;
+        audio_channel_tone_set(ONE, channel->music_current.notes[channel->note_index].wave_lenght);
     }
-    TA1CTL &= ~TAIFG;
+    // TA1CCTL0 &= CCIFG;  // CCIFG is automaticaly reset
     return;
 }
 
 #pragma vector = TIMER2_A0_VECTOR
 __interrupt void audio_channel_2_ISR() {
-    audio_data_ref.note_repetitions++;
-    if (audio_data_ref.note_repetitions >= audio_data_ref.music_current.notes[audio_data_ref.note_index].repetitions) {
-        audio_data_ref.note_repetitions = 0;
-        audio_data_ref.note_index = audio_data_ref.note_index + 1 >= audio_data_ref.music_current.size ? 0 : audio_data_ref.note_index + 1;
-        audio_channel_tone_set(TWO, audio_data_ref.music_current.notes[audio_data_ref.note_index].wave_lenght);
+    channel_data* channel = &audio_data_ref.two;
+    channel->note_repetitions++;
+    if (channel->note_repetitions >= channel->music_current.notes[channel->note_index].repetitions) {
+        channel->note_repetitions = 0;
+        channel->note_index = channel->note_index + 1 >= channel->music_current.size ? 0 : channel->note_index + 1;
+        audio_channel_tone_set(TWO, channel->music_current.notes[channel->note_index].wave_lenght);
     }
-    TA2CTL &= ~TAIFG;
+    // TA2CTL &= ~TAIFG; // CCIFG is automaticaly reset
     return;
 }

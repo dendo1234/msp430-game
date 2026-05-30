@@ -33,11 +33,9 @@ typedef struct {
 } audio_data;
 
 
-
-
 void audio_data_init();
 
-
 void audio_channel_tone_set(channel_index audio_channel, useconds wave_lenght);
+void audio_channel_music_set(channel_index audio_channel, music* music);
 
 __interrupt void audio_channel_1_ISR();
