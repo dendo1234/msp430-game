@@ -2,7 +2,7 @@
 
 #include "audio.h"
 #include "musics.h"
-#include "spi.h"
+#include "display.h"
 
 #define SMCLK_FREQUENCY 1048576
 #define FRAME_TARGET 16666
@@ -18,15 +18,14 @@ void debaunce() {
 void main (void)
 {
     WDTCTL = WDTPW | WDTHOLD;
-    __enable_interrupt();
-
 
     audio_data_init();
 
     audio_channel_tone_set(ONE, 2000);
     // audio_channel_tone_set(TWO, 2000);
 
-    lcd_init();
+    display_init();
+    display_test2();
 
     TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | ID_0 | TACLR;
     TA0CCR1 = FRAME_TARGET;
@@ -47,6 +46,8 @@ void main (void)
     int frame_start = 0;
     int delta_time = 0;
     int frame_max = 0;
+
+    __enable_interrupt();
     while(1) {
         // Frame start
         delta_time = TA0R;
