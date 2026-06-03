@@ -58,7 +58,9 @@ void display_test2() {
 
 }
 
-void display_write_column_shift(uint8_t index, uint16_t scroll_pos) {
+#include "coordinates.h"
+
+void display_test3() {
     const uint16_t colors[] = {
         0xF800, // Red
         0xFAA0, // Orange-red
@@ -78,76 +80,17 @@ void display_write_column_shift(uint8_t index, uint16_t scroll_pos) {
         0xF800, // Back to red
     };
 
-    // when scroll address = 33 -> address 32 must be re writeen
-    // when scroll address = 34 -> address 33 must be re writeen
-    // when scroll addrres = lcd_width -32 -> address lcd_width -33 must be re writeen
-    // when scroll addresss = 32 -> address lcd_width -32 must be re writeen
+    uint8_t scroll_count = 0;
 
-    // symplify
+    while (1) {
+        lcd_cmd_vertical_scrolling_start_address(32+scroll_count);
 
-    // when scroll = 0 -> address 255 must be re written
-    // when scroll = 8 -> address 7 must be re writeen
+        memory_coord coord = coord_camera_to_memory(255, scroll_count);
 
-    // when scroll 0 -> the memory at 32 (memory space) is at 32 (pysical space)
-    // when scroll 0 -> the memory at 40 (memory space) is at 40 (pysical space)
+        lcd_cmd_page_set(coord, coord);
+        lcd_send_command(MEMORY_WRITE);
+        lcd_send_wdata_repeat(colors[scroll_count & 15], 2*lcd_height);
 
-    // when scroll 1 -> the memory at 32 (memory space) is at 287 (pysical space)
-    // when scroll 1 -> the memory at 33 (memory space) is at 32 (pysical space)
-    // when scroll 1 -> the memory at 40 (memory space) is at 39 (pysical space)
-
-    // when scroll 8 -> the memory at 40 (memory space) is at 32 (pysical space)
-    // when scroll 8 -> the memory at 44 (memory space) is at 36 (pysical space)
-    // when scroll 8 -> the memory at 32 (memory space) is at 280 (pysical space)
-    // when scroll 8 -> the memory at 39 (memory space) is at 287 (pysical space)
-
-    // translation
-    // memory space (scroll) -> physical space : phy_x = mem_x - scroll ------------> mem_x = phy_x + scroll -> mem_x = (camera_x + offset) + scroll
-
-    /* 
-    phy_x = mem_x - scroll
-    if (phy_x < 0) {
-        phy_x = 288 - phy_x
-
+        scroll_count += 2;
     }
-    */ 
-    
-    /*
-    mem_x = phy_x + scroll
-    if (mem_x > 287) {
-    mem_x = mem_x - 288
-
-    }
-    */
-
-    /*
-    temp = cam_x + scroll
-    if (temp > 255) {
-    temp = temp - 255
-
-    }
-    mem_x = temp + 32;
-    */
-
-    /*
-    uint8_t temp = cam_x + scroll
-    uint16_t mem_x = (uint16_t)temp + 32;
-    */
-
-    // camera space -> 
-
-
-    // address translation:
-    // world space -> camera space -> lcd physical space -> lcd memory space
-    // world space: (world_x, world_y) -> (400, 200); 
-    // camera space: camera_pox_x -> (world_x - camera_pos_x, world_y); camera space is defined (0:255,0:239), everything else is culled;
-    // lcd physical space: lcd_offset_x -> (camera_x + lcd_offset_x, camera_y); lcd_physcal space is defined (32:287,0:239)
-    // lcd memory space: scroll_pos -> ()
-    
-
-    
-    uint16_t current_color = colors[index];
-    lcd_cmd_page_set(lcd_width-32, lcd_width-32);
-    
-    
-
 }
