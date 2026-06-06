@@ -1,13 +1,22 @@
 #pragma once
 
-typedef int useconds;
+#include <stdint.h>
+#include "clocks.h"
+
+
+#define TIMER_A_CLK_FREQUENCY SMCLK_FREQUENCY
+#define TIMER_B_CLK_FREQUENCY ACLK_FREQUENCY
+
+typedef uint16_t useconds;
+typedef uint16_t timer_ticks;
 
 typedef struct note {
     useconds wave_lenght;
-    int repetitions;
+    timer_ticks duration;
 } note;
 
-#define NOTE(_frequency, _duration_rounded_s) (const note){ .wave_lenght = 1000000.0/_frequency, .repetitions = (int)(_duration_rounded_s/(1.0/_frequency))}
+#define double_to_ticks(db) ((timer_ticks)((double)db*TIMER_B_CLK_FREQUENCY))
+#define NOTE(_frequency, _duration_rounded_s) (const note){ .wave_lenght = TIMER_A_CLK_FREQUENCY/_frequency, .duration = double_to_ticks(_duration_rounded_s)}
 #define NOTE_SILENCE(_duration_rounded_s) NOTE(20000, _duration_rounded_s)
 
 typedef struct {
@@ -38,4 +47,4 @@ void audio_data_init();
 void audio_channel_tone_set(channel_index audio_channel, useconds wave_lenght);
 void audio_channel_music_set(channel_index audio_channel, music* music);
 
-__interrupt void audio_channel_1_ISR();
+__interrupt void audio_isr();

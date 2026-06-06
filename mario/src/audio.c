@@ -3,6 +3,7 @@
 
 #include <msp430f5529.h>
 
+
 audio_data audio_data_ref;
 
 // Uses TA1, channels 0 and 1
@@ -11,7 +12,6 @@ audio_data audio_data_ref;
 void audio_data_init() {
     // Channel ONE
     TA1CTL = TASSEL__SMCLK | MC__UP | ID_0 | TACLR;
-    TA1CCTL0 = CCIE;
     TA1CCTL1 = OUTMOD_3;
 
     P2DIR |= BIT0;
@@ -19,8 +19,12 @@ void audio_data_init() {
 
     // Channel TWO
     TA2CTL = TASSEL__SMCLK | MC__UP | ID_0 | TACLR;
-    TA2CCTL0 = CCIE;
     TA2CCTL1 = OUTMOD_3;
+
+    // Controller
+    TB0CTL = TBSSEL__ACLK | CNTL__16 | MC__CONTINOUS | ID_0 | TBCLR;
+    TB0CCTL1 = CCIE;
+    // TB0CCTL2 = CCIE;
 
     P2DIR |= BIT4;
     P2SEL |= BIT4;
@@ -42,6 +46,7 @@ void audio_channel_tone_set(channel_index index, useconds wave_lenght) {
         TA2CCR1 = wave_lenght/2;
         break;
         default:
+        __no_operation();
     }
 }
 
@@ -54,28 +59,23 @@ void audio_channel_music_set(channel_index index, music *music) {
     }
 }
 
-#pragma vector = TIMER1_A0_VECTOR
-__interrupt void audio_channel_1_ISR() {
-    channel_data* channel = &audio_data_ref.one;
-    channel->note_repetitions++;
-    if (channel->note_repetitions >= channel->music_current.notes[channel->note_index].repetitions) {
-        channel->note_repetitions = 0;
+#pragma vector = TIMER0_B1_VECTOR
+__interrupt void audio_isr() {
+    channel_data* channel;
+    switch (__even_in_range(TB0IV, 14)) {
+        case TB0IV_TBCCR1:
+        channel = &audio_data_ref.one;
         channel->note_index = channel->note_index + 1 >= channel->music_current.size ? 0 : channel->note_index + 1;
         audio_channel_tone_set(ONE, channel->music_current.notes[channel->note_index].wave_lenght);
-    }
-    // TA1CCTL0 &= CCIFG;  // CCIFG is automaticaly reset
-    return;
-}
-
-#pragma vector = TIMER2_A0_VECTOR
-__interrupt void audio_channel_2_ISR() {
-    channel_data* channel = &audio_data_ref.two;
-    channel->note_repetitions++;
-    if (channel->note_repetitions >= channel->music_current.notes[channel->note_index].repetitions) {
-        channel->note_repetitions = 0;
+        TBCCR1 = TBR + channel->music_current.notes[channel->note_index].duration;
+        break;
+        case TB0IV_TBCCR2:
+        channel = &audio_data_ref.two;
         channel->note_index = channel->note_index + 1 >= channel->music_current.size ? 0 : channel->note_index + 1;
         audio_channel_tone_set(TWO, channel->music_current.notes[channel->note_index].wave_lenght);
+        TBCCR2 = TBR + channel->music_current.notes[channel->note_index].duration;
+        break;
+        default:
+        break;
     }
-    // TA2CTL &= ~TAIFG; // CCIFG is automaticaly reset
-    return;
 }

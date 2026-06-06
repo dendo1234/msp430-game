@@ -209,7 +209,7 @@ void lcd_init() {
     lcd_cmd_read_display_status(&status);
     if (status.raw_data != 0x00610000) {
         // unexpected display status
-        while(1);
+        // while(1);
     }
 
     lcd_send_command(SLEEP_OUT);

@@ -1,8 +1,14 @@
 #include "ili9341.h"
+#include "display.h"
 
+
+display_data display;
 
 void display_init() {
     lcd_init();
+    display.camera_pos = 0;
+    display.scroll_count = 0;
+    display.new_columns = 0;
 }
 
 void display_draw_solid_frame(uint16_t color) {
@@ -93,4 +99,55 @@ void display_test3() {
 
         scroll_count += 2;
     }
+}
+
+void display_camera_add(uint16_t x) {
+    display.camera_pos += x;
+    display.scroll_count += x;
+    display.new_columns = x;
+
+    lcd_cmd_vertical_scrolling_start_address(32+display.scroll_count);
+}
+
+void display_render_new_columns(color_picker fun) {
+    for (int i = 0; i < display.new_columns; i++) {
+        world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
+
+        memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
+        lcd_cmd_page_set(mem_coord, mem_coord);
+
+        lcd_send_command(MEMORY_WRITE);
+
+        int j = 240;
+        while (j--) {
+            lcd_send_wdata(fun(coord, j));
+        }
+    }
+}
+
+void display_render_new_columns16(color_picker fun) {
+    for (int i = 0; i < display.new_columns; i++) {
+        world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
+
+        memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
+        lcd_cmd_page_set(mem_coord, mem_coord);
+
+        lcd_send_command(MEMORY_WRITE);
+
+        int j = 240/16;
+        while (j--) {
+            lcd_send_wdata_repeat(fun(coord, j), 16);
+        }
+    }
+}
+
+color test_color_picker(world_coord x, uint8_t y) {
+    static const color colors[] = {
+        0x001f,
+        0x07E0,
+        0xF100,
+        0xffff,
+    };
+
+    return colors[(x >> 2) & 3];
 }

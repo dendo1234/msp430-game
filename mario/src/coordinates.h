@@ -1,3 +1,4 @@
+#pragma once
 /*
     I probaly spent way to much time think about the diferent cordinate systems present on this
     but regardless, the conversions are probaly as optimazed as it can get.
