@@ -21,6 +21,7 @@ typedef enum {
     MEMORY_WRITE = 0x2C,
     PARTIAL_AREA = 0x30,
     VERTICAL_SCROLLING_DEFINITION = 0x33,
+    MEMORY_ACCESS_CONTROL = 0x36,
     VERTICAL_SCROLLING_START_ADDRESS = 0x37,
     PIXEL_FORMAT_SET = 0x3A,
 
@@ -70,7 +71,7 @@ void lcd_recive_byte(uint8_t* byte);
 void lcd_recive_long(uint32_t* l);
 
 void lcd_cmd_read_display_status(ILI9341_status* ptr);
-void lcd_cmd_collumn_set(uint16_t sc, uint16_t ec);
+void lcd_cmd_column_set(uint16_t sc, uint16_t ec);
 void lcd_cmd_page_set(uint16_t sp, uint16_t ep);
 void lcd_cmd_vertical_scrolling_definition(uint16_t tfa, uint16_t vsa, uint16_t bfa);
 void lcd_cmd_vertical_scrolling_start_address(uint16_t vsp);

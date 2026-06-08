@@ -1,4 +1,5 @@
 // display == renderer
+#pragma once
 #include <stdint.h>
 #include "coordinates.h"
 
@@ -24,5 +25,6 @@ void display_reset();
 void display_camera_add(uint16_t x);
 void display_render_new_columns(color_picker fun);
 void display_render_new_columns16(color_picker fun);
+void display_render_all(color_picker fun);
 
 color test_color_picker(world_coord x, uint8_t y); 

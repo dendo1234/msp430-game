@@ -20,7 +20,7 @@ void display_test1() {
     uint16_t colors[] = {
         0x001f,
         0x07E0,
-        0xF100,
+        0xF800,
         0xffff,
     };
     uint16_t current_color;
@@ -44,15 +44,15 @@ void display_test2() {
     uint16_t current_color;
     int a = 0;
 
-    lcd_cmd_page_set(32, lcd_width/2 - 1);
+    lcd_cmd_column_set(32, lcd_width/2 - 1);
     lcd_send_command(MEMORY_WRITE);
     lcd_send_wdata_repeat(colors[0], lcd_height/2*(lcd_width-64));
 
-    lcd_cmd_page_set(lcd_width/2, lcd_width-33);
+    lcd_cmd_column_set(lcd_width/2, lcd_width-33);
     lcd_send_command(MEMORY_WRITE);
     lcd_send_wdata_repeat(colors[1], lcd_height/2*(lcd_width-64));
 
-    lcd_cmd_page_set(0, 0);
+    lcd_cmd_column_set(0, 0);
     while (1) {
         current_color = colors[a & 3];
         for (int scroll_pos = 32; scroll_pos < lcd_width-32; scroll_pos++) {
@@ -93,7 +93,7 @@ void display_test3() {
 
         memory_coord coord = coord_camera_to_memory(255, scroll_count);
 
-        lcd_cmd_page_set(coord, coord);
+        lcd_cmd_column_set(coord, coord);
         lcd_send_command(MEMORY_WRITE);
         lcd_send_wdata_repeat(colors[scroll_count & 15], 2*lcd_height);
 
@@ -114,7 +114,7 @@ void display_render_new_columns(color_picker fun) {
         world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
 
         memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_page_set(mem_coord, mem_coord);
+        lcd_cmd_column_set(mem_coord, mem_coord);
 
         lcd_send_command(MEMORY_WRITE);
 
@@ -130,13 +130,29 @@ void display_render_new_columns16(color_picker fun) {
         world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
 
         memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_page_set(mem_coord, mem_coord);
+        lcd_cmd_column_set(mem_coord, mem_coord);
 
         lcd_send_command(MEMORY_WRITE);
 
         int j = 240/16;
         while (j--) {
             lcd_send_wdata_repeat(fun(coord, j), 16);
+        }
+    }
+}
+
+void display_render_all(color_picker fun) {
+    for (int i = 0; i <= 255; i++) {
+        world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
+
+        memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
+        lcd_cmd_column_set(mem_coord, mem_coord);
+
+        lcd_send_command(MEMORY_WRITE);
+
+        int j = 240;
+        while (j--) {
+            lcd_send_wdata(fun(coord, j));
         }
     }
 }

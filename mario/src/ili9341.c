@@ -141,7 +141,7 @@ void lcd_cmd_partial_mode() {
     lcd_send_command(PARTIAL_MODE_ON);
 }
 
-void lcd_cmd_collumn_set(uint16_t sc, uint16_t ec) {
+void lcd_cmd_column_set(uint16_t sc, uint16_t ec) {
     assert(sc <= ec);
     assert(ec < 0xF0);
     lcd_send_command(COLUMN_ADDRESS_SET);
@@ -163,6 +163,11 @@ void lcd_cmd_vertical_scrolling_definition(uint16_t tfa, uint16_t vsa, uint16_t 
     lcd_send_wdata(tfa);
     lcd_send_wdata(vsa);
     lcd_send_wdata(bfa);
+}
+
+void lcd_cmd_memory_access_control(uint8_t parameter) {
+    lcd_send_command(MEMORY_ACCESS_CONTROL);
+    lcd_send_data(parameter);
 }
 
 void lcd_cmd_vertical_scrolling_start_address(uint16_t vsp) {
@@ -219,7 +224,8 @@ void lcd_init() {
     lcd_cmd_pixel_format_set();
     // lcd_cmd_partial_mode();
 
-    lcd_cmd_page_set(0x20, 0x11F);
+    lcd_cmd_memory_access_control(0x0 | 0x20 | 0x08 | 0x40); // "landscape" + bgr because I don't know why the colors get fliped  + flip the colum
+    lcd_cmd_column_set(0x20, 0x11F);
 
     lcd_cmd_vertical_scrolling_definition(32, lcd_width-64, 32);
     lcd_cmd_vertical_scrolling_start_address(0);

@@ -6,6 +6,7 @@
 #include "ili9341.h"
 #include "coordinates.h"
 #include "clocks.h"
+#include "tilemap.h"
 
 #define FRAME_TARGET SMCLK_FREQUENCY*0.016667 //60 fps
 
@@ -24,7 +25,7 @@ void main (void)
 {
     WDTCTL = WDTPW | WDTHOLD;
 
-    audio_data_init();
+    // audio_data_init();
 
     display_init();
 
@@ -51,6 +52,8 @@ void main (void)
     int delta_time = 0;
     volatile uint16_t frame_max = 0;
 
+    display_render_all(tilemap_color_picker);
+
     __enable_interrupt();
     while(1) {
         // Frame start
@@ -73,7 +76,9 @@ void main (void)
         }
 
         display_camera_add(3);
-        display_render_new_columns16(test_color_picker);
+        display_render_new_columns(tilemap_color_picker);
+        // display_test1();
+
 
         //Frame end
         WORK_LED_OFF;
