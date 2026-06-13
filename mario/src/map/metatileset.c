@@ -72,19 +72,24 @@ void metatile_ret_copy_vert(Metatile metatile, uint16_t* destination, uint8_t x1
     
     uint8_t div = x2 > 7 ? 7 : x2;
     uint8_t div2 = x1 > 8 ? x1 : 8;
+
+    uint8_t offset1 = 8 - (div - x1 + 1);
+    uint8_t offset2 = 8 - (x2 - div2 + 1);
     
     for (int j = 0; j <= 1; j++) {
-        const color* q1 = tileset_main[*(tiles + j)];
-        const color* q2 = tileset_main[*(tiles + j)];
+        const color* q1 = tileset_main[*(tiles + j)] + x1;
+        const color* q2 = tileset_main[*(tiles + 1 + j)] + div2 - 8;
         for (int i = 0; i < 8; i++) {
             #pragma MUST_ITERATE(0,8,1)
             for (int k = x1; k <= div; k++) {
-                *destination++ = q1[k + i*8];
+                *destination++ = *q1++;
             }
             #pragma MUST_ITERATE(0,8,1)
             for (int k = div2; k <= x2; k++) {
-                *destination++ = q2[k-8 + i*8];
+                *destination++ = *q2++;
             }
+            q1 += offset1;
+            q2 += offset2;
         }
     }
 

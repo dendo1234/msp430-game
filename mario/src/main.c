@@ -8,7 +8,7 @@
 #include "clocks.h"
 #include "map/tilemap.h"
 
-#define FRAME_TARGET ((SMCLK_FREQUENCY/2 /* timer divider */)*0.016667) //60 fps
+#define FRAME_TARGET ((SMCLK_FREQUENCY/1 /* timer divider */)*0.016667) //60 fps
 
 #define WORK_LED_ON P1OUT |= BIT0
 #define WORK_LED_OFF P1OUT &= ~BIT0
