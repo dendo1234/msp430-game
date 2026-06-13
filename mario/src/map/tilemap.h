@@ -50,7 +50,7 @@ static const Map map1 = {
 };
 
 static const Tilemap tilemap1 = {
-    .tileset = &tileset1,
+    .tileset = &tileset_main,
     .map = &map1,
 };
 

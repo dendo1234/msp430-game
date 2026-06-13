@@ -2,12 +2,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-const static unsigned pixel_count = 61440;
-const static unsigned lcd_width = 320;
-const static unsigned lcd_height = 240;
-const static unsigned window_width = 256;
-const static unsigned window_height = 240;
-const static unsigned lcd_offset = 32;
+#include "coordinates.h"
+
+const static uint16_t pixel_count = 61440;
+const static uint16_t lcd_width = 320;
+const static uint8_t lcd_height = 240;
+const static uint16_t window_width = 256;
+const static uint8_t window_height = 240;
+const static uint8_t lcd_offset = 32;
+
+const static uint16_t mem_coord_max = 287;
+const static uint16_t mem_coord_min = 32;
 
 typedef enum {
     SOFTWARE_RESET = 0x01,
@@ -65,6 +70,7 @@ void lcd_send_datas(const uint8_t* bytes, uint16_t count);
 void lcd_send_data_repeat(uint8_t byte, uint16_t repetitions);
 void lcd_send_wdata(uint16_t word);
 void lcd_send_wdata_repeat(uint16_t word, uint16_t repetitions);
+void lcd_send_wdatas(const uint16_t* words, uint16_t count);
 void lcd_send_command(LcdCmd command);
 
 void lcd_recive_byte(uint8_t* byte);

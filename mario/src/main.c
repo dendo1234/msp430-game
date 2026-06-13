@@ -6,20 +6,15 @@
 #include "ili9341.h"
 #include "coordinates.h"
 #include "clocks.h"
-#include "tilemap.h"
+#include "map/tilemap.h"
 
-#define FRAME_TARGET SMCLK_FREQUENCY*0.016667 //60 fps
+#define FRAME_TARGET ((SMCLK_FREQUENCY/2 /* timer divider */)*0.016667) //60 fps
 
 #define WORK_LED_ON P1OUT |= BIT0
 #define WORK_LED_OFF P1OUT &= ~BIT0
 
 #define SLEEP_LED_ON P4OUT |= BIT7
 #define SLEEP_LED_OFF P4OUT &= ~BIT7
-
-void debaunce() {
-    volatile int i = 20000;
-    while (i--);
-}
 
 void main (void)
 {
@@ -29,7 +24,7 @@ void main (void)
 
     display_init();
 
-    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | ID_0 | TACLR;
+    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | ID__1 | TACLR;
     TA0CCTL1 = CCIE;
     TA0CCR1 = FRAME_TARGET;
     
@@ -52,13 +47,16 @@ void main (void)
     int delta_time = 0;
     volatile uint16_t frame_max = 0;
 
-    display_render_all(tilemap_color_picker);
+    // display_render_all(tilemap_color_picker);
+
+    bool render_mode = false;
 
     __enable_interrupt();
     while(1) {
         // Frame start
         delta_time = TA0R;
         TA0CTL |= TACLR;
+        TA0CTL &= ~TAIFG;
         frame_start = TA0R;
 
         WORK_LED_ON;
@@ -66,18 +64,21 @@ void main (void)
         if (!(P2IN & BIT1)) {
             // s1 Pressed
             audio_channel_music_set(TWO, &teste_theme);
-            debaunce();
         }
         if (!(P1IN & BIT1)) {
             // s2 Pressed
-            TA1CCR0 /= 2;
-            TA1CCR1 /= 2;
-            debaunce();
+            render_mode = !render_mode;
+
         }
 
         display_camera_add(3);
-        display_render_new_columns(tilemap_color_picker);
-        // display_test1();
+
+        if (render_mode) {
+            display_render_new_columns(tilemap_color_picker);
+        } else {
+            display_render_new_columns_metatilemap();
+        }
+        // display_test2();
 
 
         //Frame end
@@ -86,7 +87,7 @@ void main (void)
         uint16_t frame_end = TA0R;
         uint16_t frame_duration = frame_end - frame_start;
         frame_max = frame_duration > frame_max ? frame_duration : frame_max;
-        if (frame_duration < FRAME_TARGET-500) {
+        if (frame_duration < FRAME_TARGET-100 && !(TA0CTL & TAIFG)) {
             SLEEP_LED_ON;
             __bis_SR_register(LPM0_bits + GIE); // enter low power mode
         }

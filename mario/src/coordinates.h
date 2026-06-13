@@ -82,7 +82,7 @@ typedef uint16_t physcal_coord;
 typedef uint16_t memory_coord;
 
 
-static bool coord_cull(world_coord x, world_coord camera_pos) {
+inline bool coord_cull(world_coord x, world_coord camera_pos) {
     return (x - camera_pos) < 256;
 }
 
@@ -91,7 +91,7 @@ static bool coord_cull(world_coord x, world_coord camera_pos) {
     x: position of pixel in camera space, if it's visible: (0:255)
     camera_pos: position of the leftmost visible in screen on world space
 */
-static world_coord coord_camera_to_world(camera_coord x, world_coord camera_pos) {
+inline world_coord coord_camera_to_world(camera_coord x, world_coord camera_pos) {
     return x + camera_pos;
 }
 
@@ -100,16 +100,34 @@ static world_coord coord_camera_to_world(camera_coord x, world_coord camera_pos)
     x: position of pixel in camera space, if it's visible: (0:255)
     scroll_count: number of lines scrolled
 */
-static memory_coord coord_camera_to_memory(camera_coord x, uint8_t scroll_count) {
-    return (uint16_t)(uint8_t)(x+scroll_count) + 32;
+inline memory_coord coord_camera_to_memory(camera_coord x, uint8_t scroll_count) {
+    return (uint8_t)(x+scroll_count) + 32;
 }
 
 /*
 @input:
-    x: position of pixel in camera space, if it's visible: (0:255)
+    x: position of pixel in world space
     scroll_count: number of lines scrolled
     camera_pos: position of the leftmost visible in screen on world space
 */
-static memory_coord coord_world_to_memory(world_coord x, uint8_t scroll_count, world_coord camera_pos) {
-    return (x-camera_pos+scroll_count) + 32;
+inline memory_coord coord_world_to_memory(world_coord x, uint8_t scroll_count, world_coord camera_pos) {
+    return (uint16_t)(uint8_t)(x-camera_pos+scroll_count) + 32;
+}
+
+/*
+@input:
+    x: position of pixel in memory space (32:287)
+    scroll_count: number of lines scrolled
+    camera_pos: position of the leftmost visible in screen on world space
+*/
+inline world_coord coord_memory_to_world(memory_coord x, uint8_t scroll_count, world_coord camera_pos) {
+    return (uint8_t)(x-32-scroll_count) + camera_pos;
+}
+
+inline camera_coord coord_memory_to_camera(memory_coord x, uint8_t scroll_count) {
+    return (uint8_t)(x-32-scroll_count);
+}
+
+inline camera_coord coord_world_to_camera(world_coord x, world_coord camera_pos) {
+    return x - camera_pos;
 }

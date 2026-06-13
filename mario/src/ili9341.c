@@ -79,6 +79,15 @@ void lcd_send_datas(const uint8_t* bytes, uint16_t count) {
     }
 }
 
+void lcd_send_wdatas(const uint16_t* words, uint16_t count) {
+    spi_wait_not_busy();
+    DCX_high();
+    while(count--) {
+        spi_send_byte(*words >> 8);
+        spi_send_byte(*words++);
+    }
+}
+
 void lcd_send_command(LcdCmd command) {
     spi_wait_not_busy();
     DCX_low();

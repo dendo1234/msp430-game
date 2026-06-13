@@ -1,0 +1,36 @@
+#pragma once
+// its assumend only one MetatileSet existis
+#include <assert.h>
+#include "tileset.h"
+
+typedef Tile Tile16x16[4];
+
+typedef enum __attribute__((packed)) {
+    META_EMPTY = 0,
+    META_SKY = 1,
+    META_BRICK = 2,
+    Metatile_Count
+} Metatile;
+
+static_assert(sizeof(Metatile) == 1, "Metatile enum must be packed");
+
+typedef Tile16x16 MetatileSet[Metatile_Count];
+
+extern const MetatileSet metatileset_main;
+
+typedef struct {
+    uint8_t x1;
+    uint8_t x2;
+    uint8_t y1;
+    uint8_t y2;
+} Metatile_Rect;
+
+Tile metatile_get_tile(Metatile metatile, uint8_t x, uint8_t y);
+
+void metatile_full_copy(Metatile metatile, uint16_t* destination);
+void metatile_ret_copy(Metatile metatile, uint16_t* destination, Metatile_Rect rect);
+void metatile_ret_copy_vert(Metatile metatile, uint16_t* destination, uint8_t x1, uint8_t x2);
+
+color metatile_pixel_copy(Metatile metatile, uint8_t x, uint8_t y);
+
+void metatile_line_copy(Metatile metatile, uint16_t** destination_ptr, uint8_t x1, uint8_t x2, uint8_t y);

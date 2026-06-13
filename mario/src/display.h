@@ -3,14 +3,16 @@
 #include <stdint.h>
 #include "coordinates.h"
 
+typedef uint16_t color;
+
 typedef struct {
     world_coord camera_pos;
     uint8_t scroll_count;
     uint8_t new_columns;
+    color buffer[256];
     uint8_t dirty_8x8[4*30]; // each bit symbolizes that the renderer should update the given 8x8
 } display_data;
 
-typedef uint16_t color;
 
 typedef color (*color_picker)(world_coord x, uint8_t y);
 
@@ -26,5 +28,7 @@ void display_camera_add(uint16_t x);
 void display_render_new_columns(color_picker fun);
 void display_render_new_columns16(color_picker fun);
 void display_render_all(color_picker fun);
+
+void display_render_new_columns_metatilemap();
 
 color test_color_picker(world_coord x, uint8_t y); 
