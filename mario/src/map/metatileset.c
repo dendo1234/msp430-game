@@ -85,21 +85,41 @@ void metatile_ret_copy_vert(Metatile metatile, uint16_t* destination, uint8_t x1
 
     uint8_t left_offset = 8 - left_count;
     uint8_t right_offset = 8 - right_count;
-    
+
     for (int j = 0; j <= 1; j++) {
-        const color* q1 = tileset_main[*(tiles + j)] + x1;
-        const color* q2 = tileset_main[*(tiles + 1 + j)] + (x2 - right_count - 7);
+        const color* q1 = tileset_main[tiles[j*2]] + x1;
+        const color* q2 = tileset_main[tiles[j*2 + 1]] + (x2 - right_count - 7);
         for (int i = 0; i < 8; i++) {
             uint8_t count = left_count;
-            while (count--) {
+            while (count) {
                 *destination++ = *q1++;
+                count--;
             }
             count = right_count;
-            while (count--) {
+            while (count) {
                 *destination++ = *q2++;
+                count--;
             }
             q1 += left_offset;
             q2 += right_offset;
+        }
+    }
+}
+
+void metatile_col_copy(Metatile metatile, uint16_t* destination, uint8_t x) {
+    const Tile* tiles = metatileset_main[metatile];
+    const Tile* tile;
+    if (x < 8) {
+        tile = tiles;
+    } else {
+        tile = tiles + 1;
+        x -= 8;
+    }
+
+    for (int j = 0; j <= 1; j++) {
+        const color* q = tileset_main[tiles[j*2]] + x;
+        for (int i = 0; i < 8; i++) {
+            *destination++ = *q++;
         }
     }
 }

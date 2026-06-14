@@ -51,7 +51,7 @@ void main (void)
 
     bool render_mode = false;
 
-    // __enable_interrupt();
+    __enable_interrupt();
     while(1) {
         // Frame start
         delta_time = TA0R;
@@ -89,7 +89,7 @@ void main (void)
         frame_max = frame_duration > frame_max ? frame_duration : frame_max;
         if (frame_duration < FRAME_TARGET-100 && !(TA0CTL & TAIFG)) {
             SLEEP_LED_ON;
-            // __bis_SR_register(LPM0_bits + GIE); // enter low power mode
+            __bis_SR_register(LPM0_bits + GIE); // enter low power mode
         }
     }
 }
