@@ -70,30 +70,38 @@ void metatile_ret_copy_vert(Metatile metatile, uint16_t* destination, uint8_t x1
 
     assert(x1 <= x2 && x2 < 16);
     
-    uint8_t div = x2 > 7 ? 7 : x2;
-    uint8_t div2 = x1 > 8 ? x1 : 8;
+    uint8_t left_count = 0;
+    uint8_t right_count = 0;
 
-    uint8_t offset1 = 8 - (div - x1 + 1);
-    uint8_t offset2 = 8 - (x2 - div2 + 1);
+    if (x1 < 8) {
+        left_count = x2 > 7 ? 7 - x1 : x2 - x1;
+        left_count++;
+    }
+
+    if (x2 > 7) {
+        right_count = x1 > 7 ? x2 - x1 : x2 - 8;
+        right_count++;
+    }
+
+    uint8_t left_offset = 8 - left_count;
+    uint8_t right_offset = 8 - right_count;
     
     for (int j = 0; j <= 1; j++) {
         const color* q1 = tileset_main[*(tiles + j)] + x1;
-        const color* q2 = tileset_main[*(tiles + 1 + j)] + div2 - 8;
+        const color* q2 = tileset_main[*(tiles + 1 + j)] + (x2 - right_count - 7);
         for (int i = 0; i < 8; i++) {
-            #pragma MUST_ITERATE(0,8,1)
-            for (int k = x1; k <= div; k++) {
+            uint8_t count = left_count;
+            while (count--) {
                 *destination++ = *q1++;
             }
-            #pragma MUST_ITERATE(0,8,1)
-            for (int k = div2; k <= x2; k++) {
+            count = right_count;
+            while (count--) {
                 *destination++ = *q2++;
             }
-            q1 += offset1;
-            q2 += offset2;
+            q1 += left_offset;
+            q2 += right_offset;
         }
     }
-
-
 }
 
 color metatile_pixel_copy(Metatile metatile, uint8_t x, uint8_t y) {

@@ -231,6 +231,7 @@ void display_render_new_columns_metatilemap() {
         pos = pos2+1;
 
     } while (pos != 0);
+    __no_operation();
 }
 
 // void display_render_new_columns_metatilemap() {
