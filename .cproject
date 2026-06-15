@@ -27,7 +27,7 @@
                             </option>
                             <option id="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION.1599347295" superClass="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION" value="21.6.1.LTS" valueType="string"/>
                             <targetPlatform id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.targetPlatformDebug.1767510077" name="Platform" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.targetPlatformDebug"/>
-                            <builder buildPath="${BuildDirectory}" id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.builderDebug.224293975" keepEnvironmentInBuildfile="false" name="GNU Make" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.builderDebug"/>
+                            <builder buildPath="${BuildDirectory}" id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.builderDebug.224293975" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU Make" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.builderDebug"/>
                             <tool id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.compilerDebug.672771935" name="MSP430 Compiler" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.compilerDebug">
                                 <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DEFINE.1381892263" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DEFINE" valueType="definedSymbols">
                                     <listOptionValue value="__MSP430F5529__"/>
@@ -64,6 +64,7 @@
                                 <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DIAG_REMARK.2088873177" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DIAG_REMARK" valueType="stringList">
                                     <listOptionValue value="2170"/>
                                 </option>
+                                <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DIAG_SUPPRESS.327171321" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DIAG_SUPPRESS" valueType="stringList"/>
                             </tool>
                             <tool id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.linkerDebug.678148073" name="MSP430 Linker" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.linkerDebug">
                                 <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.linkerID.LIBRARY.1356984371" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.linkerID.LIBRARY" valueType="libs">
@@ -155,6 +156,9 @@
                                 <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.LANGUAGE_MODE.1117594195" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.LANGUAGE_MODE" value="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.LANGUAGE_MODE.RELAXED_ANSI" valueType="enumerated"/>
                                 <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.ANALYZE.1967408513" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.ANALYZE" value="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.ANALYZE._none" valueType="enumerated"/>
                                 <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.ANALYZE_ONLY.1341569846" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.ANALYZE_ONLY" value="false" valueType="boolean"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DIAG_SUPPRESS.1327453226" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.DIAG_SUPPRESS" valueType="stringList">
+                                    <listOptionValue value="2170"/>
+                                </option>
                             </tool>
                             <tool id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.linkerRelease.1165358173" name="MSP430 Linker" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.linkerRelease">
                                 <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.linkerID.LIBRARY.612524276" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.linkerID.LIBRARY" valueType="libs">
@@ -183,11 +187,6 @@
                             </tool>
                         </toolChain>
                     </folderInfo>
-                    <fileInfo id="com.ti.ccstudio.buildDefinitions.MSP430.Release.1267487354.src/map/metatileset.c" name="metatileset.c" rcbsApplicability="disable" resourcePath="src/map/metatileset.c" toolsToInvoke="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.compilerRelease.971634867.1952774207">
-                        <tool id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.compilerRelease.971634867.1952774207" name="MSP430 Compiler" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.exe.compilerRelease.971634867">
-                            <option id="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.OPT_FOR_SPEED.226129224" superClass="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.OPT_FOR_SPEED" value="com.ti.ccstudio.buildDefinitions.MSP430_21.6.compilerID.OPT_FOR_SPEED._none" valueType="enumerated"/>
-                        </tool>
-                    </fileInfo>
                 </configuration>
             </storageModule>
             <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

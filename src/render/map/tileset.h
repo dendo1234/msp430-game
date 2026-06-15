@@ -1,5 +1,5 @@
 // its assumed only one Tileset exists
-#include "display.h"
+#include "render/display.h"
 #include <assert.h>
 
 static const uint8_t tile_width = 8;

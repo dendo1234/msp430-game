@@ -2,11 +2,9 @@
 
 #include "audio.h"
 #include "musics.h"
-#include "display.h"
-#include "ili9341.h"
+#include "render/display.h"
 #include "coordinates.h"
 #include "clocks.h"
-#include "map/tilemap.h"
 
 #define FRAME_TARGET ((SMCLK_FREQUENCY/1 /* timer divider */)*0.016667) //60 fps
 
@@ -73,13 +71,7 @@ void main (void)
 
         display_camera_add(3);
 
-        if (render_mode) {
-            display_render_new_columns(tilemap_color_picker);
-        } else {
-            display_render_new_columns_metatilemap();
-        }
-        // display_test2();
-
+        display_render_new_columns_metatilemap();
 
         //Frame end
         WORK_LED_OFF;

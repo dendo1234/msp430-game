@@ -22,19 +22,8 @@ void tilemap_buffer_copy(const Tilemap *tilemap, uint16_t* buf, world_coord x1, 
     }
 }
 
-color tilemap_color_picker(world_coord x, uint8_t y) {
-    uint16_t buf;
-    tilemap_buffer_copy(&tilemap1, &buf, x, y, x, y);
-    return buf;
-}
-
-// void tilemap_copy_to_buffer(Tilemap* tilemap, world_coord src_x, uint8_t src_y, uint8_t width, uint8_t height, uint8_t* buf) {
-//     for (int j = 0; j < height; j++) {
-//         for (int i = 0; i < width; i++) {
-//             tilemap.tileset
-//             *buf = ;
-
-//         }
-//     }
-
+// color tilemap_color_picker(world_coord x, uint8_t y) {
+//     uint16_t buf;
+//     tilemap_buffer_copy(&tilemap1, &buf, x, y, x, y);
+//     return buf;
 // }

@@ -30,3 +30,5 @@ makefile
 
 *.clangd
 .vscode
+.settings
+.theia

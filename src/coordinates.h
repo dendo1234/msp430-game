@@ -74,7 +74,7 @@
     // lcd physical space: lcd_offset_x -> (camera_x + lcd_offset_x, camera_y); lcd_physcal space is defined (32:287,0:239)
     // lcd memory space: scroll_pos -> ((uint16_t)((uint8_t)(physical_x-32) + scroll) + 32); defined(32:287, 0:239)
 
-#include "ili9341.h"
+#include "render/ili9341.h"
 
 typedef uint16_t world_coord;
 typedef uint8_t camera_coord;
