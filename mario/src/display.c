@@ -158,7 +158,6 @@ void display_render_all(color_picker fun) {
     }
 }
 
-
 #include "map/metatileset.h"
 #include "map/metatilemap.h"
 #include "coordinates.h"
@@ -171,150 +170,43 @@ void display_render_new_columns_metatilemap() {
     }
 
     camera_coord pos = 255-display.new_columns+1;
+    world_coord world_pos = coord_camera_to_world(pos, display.camera_pos);
 
     volatile uint16_t time_coords = 0;
     volatile uint16_t time_spi =  0;
     volatile uint16_t time_buffer = 0;
 
-    #pragma MUST_ITERATE(1,3,1)
-    do {
+    for (uint16_t i = pos; i <= 255; i++) {
         TA0CTL |= TACLR;
-        // 1 compute tile boundaries
-        memory_coord mem1 = coord_camera_to_memory(pos, display.scroll_count);
-        memory_coord mem2 = coord_camera_to_memory(255, display.scroll_count);
+        memory_coord mem = coord_camera_to_memory(i, display.scroll_count);
 
-        if (mem1 > mem2) {
-            // hit a memory barrier
-            mem2 = 287;
-        }
+        lcd_cmd_column_set(mem, mem);
 
-        camera_coord pos2 = coord_memory_to_camera(mem2, display.scroll_count);
+        const Metatile* metatile_current = metamap_tile_getref(&metamap1, world_pos, 0);
 
-        world_coord world_start = coord_camera_to_world(pos, display.camera_pos);
-        world_coord world_end = coord_camera_to_world(pos2, display.camera_pos);
-        world_coord tile_next_start = (world_start + 0x10) & ~0xf;
+        uint8_t col = world_pos & 0xf;
+        uint16_t* buf = display.buffer;
 
-        uint16_t x1 = world_start & 0xf;
-        uint16_t x2;
-
-        if ((world_start ^ world_end) & 0x10) {
-            // direfent tiles, move pos2 back
-            world_end = tile_next_start-1;
-            pos2 = coord_world_to_camera(world_end, display.camera_pos);
-            mem2 = coord_camera_to_memory(pos2, display.scroll_count);
-            x2 = 0xf;
-        } else {
-            x2 = world_end & 0xf;
-        }
-
-        lcd_cmd_column_set(mem1, mem2);
         lcd_send_command(MEMORY_WRITE);
-
-        uint16_t buffer_size = (x2-x1+1)*16;
-
-        const Metatile* metatile_current = metamap_tile_getref(&metamap1, world_start, 0);
 
         time_coords += TA0R;
 
         for (int i = 0; i < 15; i++) {
             TA0CTL |= TACLR;
-            metatile_ret_copy_vert(*metatile_current, display.buffer, x1, x2);
+            metatile_col_copy(*metatile_current, buf, col);
             metatile_current += metamap1.width;
             time_buffer += TA0R;
-
-            TA0CTL |= TACLR;
-            // send buffer
-            lcd_send_wdatas(display.buffer, buffer_size);
-            time_spi += TA0R;
+            buf += 16;
         }
 
-        pos = pos2+1;
+        // send buffer
+        TA0CTL |= TACLR;
+        lcd_send_wdatas(display.buffer, 240);
+        time_spi += TA0R;
 
-    } while (pos != 0);
-    __no_operation();
+        world_pos++;
+    }
 }
-
-// void display_render_new_columns_metatilemap() {
-//     assert(display.new_columns <= 16);
-
-//     memory_coord mem_coord_end = coord_camera_to_memory(255, display.scroll_count);
-//     memory_coord mem_coord_start = coord_camera_to_memory(255-display.new_columns, display.scroll_count);
-
-//     Metatile_Rect rect;
-//     rect.y1 = 0;
-//     rect.y2 = 15;
-
-//     if (mem_coord_end < mem_coord_start) {
-//         // bad ending
-//         lcd_cmd_column_set(mem_coord_start, mem_coord_max);
-
-//         world_coord coord_end = coord_memory_to_world(mem_coord_max, display.scroll_count, display.camera_pos);
-//         world_coord coord_start = coord_end - (mem_coord_max - mem_coord_start);
-
-//         lcd_send_command(MEMORY_WRITE);
-
-//         #pragma MUST_ITERATE(1,2,1)
-//         for (int i = coord_start; i < coord_end; i += 1 << 4) {
-//             if (i == coord_start) {
-//                 rect.x1 = coord_start & 0xf;
-//                 rect.x2 = coord_end & 0xf < coord_start & 0xf ? 0xf : coord_end & 0xf;
-//             } else {
-//                 rect.x1 = 0;
-//                 rect.x2 = coord_end & 0xf;
-//             }
-
-//             uint8_t bufsize = (rect.x2 - rect.x1 + 1) * 16;
-//             for (int j = 0; j < 240; j += 16) {
-//                 Metatile tile = metamap_tile_get(&metamap1, coord_start, j);
-//                 metatile_ret_copy(tile, display.buffer, rect);
-//                 lcd_send_wdatas(display.buffer, bufsize);
-//             }
-//         }
-//         mem_coord_start = mem_coord_min;
-//     }
-
-//     world_coord coord_end = coord_camera_to_world(255, display.camera_pos);
-//     world_coord coord_start = coord_memory_to_world(mem_coord_start, display.scroll_count, display.camera_pos);
-
-//     lcd_cmd_column_set(mem_coord_start, mem_coord_end);
-
-//     uint16_t div1 = mem_coord_start & 0xf;
-//     if ((coord_end & 0xf) < (coord_start & 0xf)) {
-        
-//     }
-
-//     world_coord world_div = (coord_start & 0xfff0) + 0x10;
-//     memory_coord mem_div = coord_camera_to_memory(coord_world_to_camera(world_div, display.camera_pos), display.scroll_count);
-
-//     // for every tile in range (coord_start -> coord_end)
-//     // get memory bounds (assume that no memory border can occour)
-//     // copy data
-
-
-//     #pragma MUST_ITERATE(1,2,1)
-//     for (int i = coord_start; i < coord_end; i = (i + (1 << 4)) & 0xfff0) {
-//         lcd_cmd_column_set(mem_coord_start, mem_div);
-//         if (i == coord_start) {
-
-//             rect.x1 = coord_start & 0xf;
-//             rect.x2 = (coord_end & 0xf) < (coord_start & 0xf) ? 0xf : coord_end & 0xf;
-//         } else {
-//             rect.x1 = 0;
-//             rect.x2 = coord_end & 0xf;
-//         }
-
-//         lcd_send_command(MEMORY_WRITE);
-
-//         uint8_t bufsize = (rect.x2 - rect.x1 + 1) * 16;
-//         for (int j = 0; j < 240; j += 16) {
-//             Metatile tile = metamap_tile_get(&metamap1, coord_start, j);
-//             metatile_ret_copy(tile, display.buffer, rect);
-//             lcd_send_wdatas(display.buffer, bufsize);
-//         }
-//         mem_coord_start = mem_div;
-//         mem_div = mem_coord_end;
-//     }
-// }
 
 color test_color_picker(world_coord x, uint8_t y) {
     static const color colors[] = {

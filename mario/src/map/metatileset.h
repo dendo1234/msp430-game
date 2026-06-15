@@ -34,3 +34,4 @@ void metatile_ret_copy_vert(Metatile metatile, uint16_t* destination, uint8_t x1
 color metatile_pixel_copy(Metatile metatile, uint8_t x, uint8_t y);
 
 void metatile_line_copy(Metatile metatile, uint16_t** destination_ptr, uint8_t x1, uint8_t x2, uint8_t y);
+void metatile_col_copy(Metatile metatile, uint16_t* destination, uint8_t x);
