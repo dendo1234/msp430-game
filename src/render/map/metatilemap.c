@@ -15,6 +15,12 @@ const Metatile* metamap_tile_getref(const MetaMap* meta_map, world_coord x, uint
     return &(meta_map->tiles[tile_coord_x + tile_coord_y * meta_map->width].tile);
 }
 
+color metamap_pixel_copy(const MetaMap* meta_map, world_coord x, uint8_t y) {
+    Metatile meta = metamap_tile_get(meta_map, x, y);
+    metatile_pixel_copy(meta, x & 0xf, y);
+
+}
+
 // Metatile metamap_tile_get2(const MetamMap* meta_map, uint8_t tile, uint8_t y) {
 //     return meta_map->tiles[tile + y * meta_map->width].tile;
 // }

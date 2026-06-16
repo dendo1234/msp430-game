@@ -1,7 +1,8 @@
-#include "ili9341.h"
-#include "display.h"
-
 #include <driverlib.h>
+#include "display.h"
+#include "ili9341.h"
+#include "coordinates.h"
+
 
 display_data display;
 
@@ -65,7 +66,6 @@ void display_test2() {
 
 }
 
-#include "coordinates.h"
 
 void display_test3() {
     const uint16_t colors[] = {
@@ -205,6 +205,37 @@ void display_render_new_columns_metatilemap() {
         time_spi += TA0R;
 
         world_pos++;
+    }
+}
+
+#include "sprite.h"
+
+void display_render_dirty_sprites() {
+    uint8_t offset_x = 0;
+    for (int j = 0; j < 4; j++, offset_x += 8) {
+        for (int i = 0; i < 30; i++) {
+            uint8_t index = 1;
+            uint8_t index_y = i;
+            while (display.dirty_8x8[j][i]) {
+                // we have something to render
+                if (display.dirty_8x8[j][i] & index) {
+                    // process
+                    uint8_t index_x = offset_x + index;
+
+                    memory_coord mem_x_start = coord_camera_to_memory(index_x << 3, display.scroll_count);
+                    uint8_t mem_y_start = index_y << 3;
+
+                    lcd_cmd_column_set(mem_x_start, mem_x_start + 8);
+                    lcd_cmd_page_set(mem_y_start, mem_y_start + 8);
+
+                    uint16_t* buffer = display.buffer;
+                    sprite_render_dirty(&buffer, index_x, index_y);
+
+                    display.dirty_8x8[j][i] &= ~index;
+                }
+                index = index << 1;
+            }
+        }
     }
 }
 

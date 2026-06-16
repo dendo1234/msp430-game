@@ -12,9 +12,8 @@ const MetatileSet metatileset_main = {
     },
 };
 
-Tile metatile_get_tile(Metatile metatile, uint8_t x, uint8_t y) {
-    assert(x < 16);
-    return metatileset_main[metatile][(x >> 3) + (y >> 2 & 0x2)];
+Tile metatile_tile_get(Metatile metatile, world_coord x, uint8_t y) {
+    return metatileset_main[metatile][((x >> 2) & 0x2) + (y >> 2 & 0x2)];
 }
 
 void metatile_full_copy(Metatile metatile, uint16_t* destination) {
@@ -125,8 +124,8 @@ void metatile_col_copy(Metatile metatile, uint16_t* destination, uint8_t x) {
     }
 }
 
-color metatile_pixel_copy(Metatile metatile, uint8_t x, uint8_t y) {
-    Tile tile = metatileset_main[metatile][x >> 3 + ((y >> 2) & 0x2)];
+color metatile_pixel_copy(Metatile metatile, world_coord x, uint8_t y) {
+    Tile tile = metatileset_main[metatile][((x >> 2) & 0x2) + ((y >> 2) & 0x2)];
     return tileset_main[tile][(x & 0x7) + (y & 0x7)*8];
 }
 

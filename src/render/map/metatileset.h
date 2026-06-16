@@ -25,13 +25,13 @@ typedef struct {
     uint8_t y2;
 } Metatile_Rect;
 
-Tile metatile_get_tile(Metatile metatile, uint8_t x, uint8_t y);
+Tile metatile_tile_get(Metatile metatile, world_coord x, uint8_t y);
+color metatile_pixel_copy(Metatile metatile, world_coord x, uint8_t y);
 
 void metatile_full_copy(Metatile metatile, uint16_t* destination);
 void metatile_ret_copy(Metatile metatile, uint16_t* destination, Metatile_Rect rect);
 void metatile_ret_copy_vert(Metatile metatile, uint16_t* destination, uint8_t x1, uint8_t x2);
 
-color metatile_pixel_copy(Metatile metatile, uint8_t x, uint8_t y);
 
 void metatile_line_copy(Metatile metatile, uint16_t** destination_ptr, uint8_t x1, uint8_t x2, uint8_t y);
 void metatile_col_copy(Metatile metatile, uint16_t* destination, uint8_t x);

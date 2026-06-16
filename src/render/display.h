@@ -10,7 +10,7 @@ typedef struct {
     uint8_t scroll_count;
     uint8_t new_columns;
     color buffer[256];
-    uint8_t dirty_8x8[4*30]; // each bit symbolizes that the renderer should update the given 8x8
+    uint8_t dirty_8x8[4][30]; // each bit symbolizes that the renderer should update the given 8x8
 } display_data;
 
 
@@ -30,5 +30,7 @@ void display_render_new_columns16(color_picker fun);
 void display_render_all(color_picker fun);
 
 void display_render_new_columns_metatilemap();
+void display_render_dirty_sprites();
+world_coord display_get_camera_pos();
 
 color test_color_picker(world_coord x, uint8_t y); 
