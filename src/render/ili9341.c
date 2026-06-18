@@ -41,6 +41,11 @@ P8.2 DC
 #define CSX_high() P2OUT |= BIT6
 #define CSX_low() P2OUT &= ~BIT6
 
+void lcd_prepare_data() {
+    spi_wait_not_busy();
+    DCX_high();
+}
+
 void lcd_send_data(uint8_t byte) {
     spi_wait_not_busy();
     DCX_high();

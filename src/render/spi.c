@@ -33,6 +33,7 @@ void spi_init() {
 }
 
 void spi_wait_not_busy() {
+    while (DMA0CTL & DMAEN);
     while (UCB0STAT & UCBUSY);
 }
 

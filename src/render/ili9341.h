@@ -65,6 +65,7 @@ typedef union {
 
 void lcd_init();
 
+void lcd_prepare_data();
 void lcd_send_data(uint8_t byte);
 void lcd_send_datas(const uint8_t* bytes, uint16_t count);
 void lcd_send_data_repeat(uint8_t byte, uint16_t repetitions);

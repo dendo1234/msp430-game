@@ -22,7 +22,7 @@ void main (void)
 
     display_init();
 
-    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | ID__1 | TACLR;
+    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | ID__8 | TACLR;
     TA0CCTL1 = CCIE;
     TA0CCR1 = FRAME_TARGET;
     
@@ -72,6 +72,8 @@ void main (void)
         display_camera_add(3);
 
         display_render_new_columns_metatilemap();
+
+        display_render_dirty_sprites();
 
         //Frame end
         WORK_LED_OFF;

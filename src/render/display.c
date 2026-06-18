@@ -11,6 +11,19 @@ void display_init() {
     display.camera_pos = 0;
     display.scroll_count = 0;
     display.new_columns = 0;
+        
+    DMACTL0 = DMA0TSEL_19;
+    DMACTL4 = DMARMWDIS; // makes debugging more stable
+    DMA0CTL = 0 
+      | DMADT_1
+      | DMADSTINCR_0
+      | DMASRCINCR_3
+      | DMADSTBYTE
+      | DMASRCBYTE
+      | DMALEVEL
+      ;
+
+    __data20_write_long((uintptr_t) &DMA0DA,(uintptr_t) &UCB0TXBUF);
 }
 
 void display_draw_solid_frame(uint16_t color) {
@@ -172,68 +185,89 @@ void display_render_new_columns_metatilemap() {
     camera_coord pos = 255-display.new_columns+1;
     world_coord world_pos = coord_camera_to_world(pos, display.camera_pos);
 
-    volatile uint16_t time_coords = 0;
-    volatile uint16_t time_spi =  0;
+    volatile uint16_t time_spi = 0;
     volatile uint16_t time_buffer = 0;
+    uint16_t temp = 0;
+
+    while (DMA0CTL & DMAEN);
+    __data20_write_long((uintptr_t) &DMA0SA,(uintptr_t) display.buffer);
+    DMA0SZ = 480;
+    
+    lcd_cmd_page_set(0, 239);
 
     for (uint16_t i = pos; i <= 255; i++) {
-        TA0CTL |= TACLR;
+        temp = TA0R;
+        while(DMA0CTL & DMAEN);
+        time_spi += TA0R - temp;
+
         memory_coord mem = coord_camera_to_memory(i, display.scroll_count);
 
         lcd_cmd_column_set(mem, mem);
 
-        const Metatile* metatile_current = metamap_tile_getref(&metamap1, world_pos, 0);
+        const Metatile* metatile_current = metamap_metatile_getref(&metamap1, world_pos, 0);
 
         uint8_t col = world_pos & 0xf;
         uint16_t* buf = display.buffer;
 
         lcd_send_command(MEMORY_WRITE);
 
-        time_coords += TA0R;
 
         for (int i = 0; i < 15; i++) {
-            TA0CTL |= TACLR;
+            temp = TA0R;
             metatile_col_copy(*metatile_current, buf, col);
             metatile_current += metamap1.width;
-            time_buffer += TA0R;
+            time_buffer += TA0R - temp;
             buf += 16;
         }
 
         // send buffer
-        TA0CTL |= TACLR;
-        lcd_send_wdatas(display.buffer, 240);
-        time_spi += TA0R;
+        lcd_prepare_data();
+        DMA0CTL |= DMAEN;
 
         world_pos++;
     }
+    __no_operation();
 }
 
 #include "sprite.h"
 
 void display_render_dirty_sprites() {
-    uint8_t offset_x = 0;
-    for (int j = 0; j < 4; j++, offset_x += 8) {
-        for (int i = 0; i < 30; i++) {
+    display.dirty_8x8[3][2] = 0xff;
+    display.dirty_8x8[3][3] = 0xff;
+
+    while (DMA0CTL & DMAEN);
+    __data20_write_long((uintptr_t) &DMA0SA,(uintptr_t) display.buffer);
+    DMA0SZ = 16;
+
+    for (uint8_t i = 0, y = 0; i < 30; i++, y += 8) {
+        while(DMA0CTL & DMAEN);
+        lcd_cmd_page_set(y, y+7);
+
+        for (int j = 0; j < 4; j++) {
+            uint8_t offset_x = j*64;
+            uint8_t offset2_x = 0;
             uint8_t index = 1;
-            uint8_t index_y = i;
+
             while (display.dirty_8x8[j][i]) {
                 // we have something to render
                 if (display.dirty_8x8[j][i] & index) {
                     // process
-                    uint8_t index_x = offset_x + index;
+                    camera_coord x = offset_x + offset2_x*8;
 
-                    memory_coord mem_x_start = coord_camera_to_memory(index_x << 3, display.scroll_count);
-                    uint8_t mem_y_start = index_y << 3;
+                    for (int k = 0; k < 8; k++) {
+                        memory_coord mem = coord_camera_to_memory(x+k, display.scroll_count);
 
-                    lcd_cmd_column_set(mem_x_start, mem_x_start + 8);
-                    lcd_cmd_page_set(mem_y_start, mem_y_start + 8);
+                        while(DMA0CTL & DMAEN);
+                        lcd_cmd_column_set(mem, mem);
 
-                    uint16_t* buffer = display.buffer;
-                    sprite_render_dirty(&buffer, index_x, index_y);
+                        lcd_prepare_data();
+                        DMA0CTL |= DMAEN;
+                    }
 
                     display.dirty_8x8[j][i] &= ~index;
                 }
                 index = index << 1;
+                offset2_x++;
             }
         }
     }
