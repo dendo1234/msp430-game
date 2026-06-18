@@ -5,6 +5,7 @@
 #include "render/display.h"
 #include "coordinates.h"
 #include "clocks.h"
+#include "render/sprite_pool.h"
 
 #define FRAME_TARGET ((SMCLK_FREQUENCY/1 /* timer divider */)*0.016667) //60 fps
 
@@ -47,7 +48,8 @@ void main (void)
 
     // display_render_all(tilemap_color_picker);
 
-    bool render_mode = false;
+    sprite_manager.sprite_slots[0] = &sprite_mario;
+    sprite_manager.background = &metamap1;
 
     __enable_interrupt();
     while(1) {
@@ -65,13 +67,14 @@ void main (void)
         }
         if (!(P1IN & BIT1)) {
             // s2 Pressed
-            render_mode = !render_mode;
 
         }
 
         display_camera_add(3);
 
         display_render_new_columns_metatilemap();
+
+        display_set_dirty(&sprite_mario.box);
 
         display_render_dirty_sprites();
 

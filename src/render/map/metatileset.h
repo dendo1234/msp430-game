@@ -2,6 +2,7 @@
 // its assumend only one MetatileSet existis
 #include <assert.h>
 #include "tileset.h"
+#include "coordinates.h"
 
 typedef Tile Tile16x16[4];
 

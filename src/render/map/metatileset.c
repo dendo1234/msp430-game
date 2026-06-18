@@ -1,5 +1,6 @@
-#include "metatileset.h"
 #include <assert.h>
+#include "metatileset.h"
+#include "coordinates.h"
 
 const MetatileSet metatileset_main = {
     [META_SKY] = {

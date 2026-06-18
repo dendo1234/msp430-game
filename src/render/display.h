@@ -2,8 +2,7 @@
 #pragma once
 #include <stdint.h>
 #include "coordinates.h"
-
-typedef uint16_t color;
+#include "sprite.h"
 
 typedef struct {
     world_coord camera_pos;
@@ -34,3 +33,5 @@ void display_render_dirty_sprites();
 world_coord display_get_camera_pos();
 
 color test_color_picker(world_coord x, uint8_t y); 
+
+void display_set_dirty(Box* box);

@@ -44,9 +44,3 @@ static const MetaMap metamap1 = {
 Metatile metamap_metatile_get(const MetaMap* meta_map, world_coord x, uint8_t y);
 Tile metamap_tile_get(const MetaMap* meta_map, world_coord x, uint8_t y);
 const Metatile* metamap_metatile_getref(const MetaMap* meta_map, world_coord x, uint8_t y);
-
-color metamap_pixel_copy(const MetaMap* meta_map, world_coord x, uint8_t y);
-
-// void metaTilemap_buffer_copy(const MetaMap* meta_tilemap, uint16_t* buf, world_coord x1, uint8_t y1, world_coord x2, uint8_t y2);
-
-

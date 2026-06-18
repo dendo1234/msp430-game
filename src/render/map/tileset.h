@@ -1,10 +1,12 @@
 // its assumed only one Tileset exists
 #pragma once
-#include "render/display.h"
 #include <assert.h>
+#include <stdint.h>
 
 static const uint8_t tile_width = 8;
 static const uint8_t tile_height = 8;
+
+typedef uint16_t color;
 
 typedef const color Tile8x8[8*8];
 
