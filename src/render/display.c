@@ -59,21 +59,21 @@ void display_test2() {
     uint16_t current_color;
     int a = 0;
 
-    lcd_cmd_column_set(32, lcd_width/2 - 1);
+    lcd_cmd_page_set(32, lcd_width/2 - 1);
     lcd_send_command(MEMORY_WRITE);
     lcd_send_wdata_repeat(colors[0], lcd_height/2*(lcd_width-64));
 
-    lcd_cmd_column_set(lcd_width/2, lcd_width-33);
+    lcd_cmd_page_set(lcd_width/2, lcd_width-33);
     lcd_send_command(MEMORY_WRITE);
     lcd_send_wdata_repeat(colors[1], lcd_height/2*(lcd_width-64));
 
-    lcd_cmd_column_set(0, 0);
+    lcd_cmd_page_set(32, 287);
     while (1) {
         current_color = colors[a & 3];
         for (int scroll_pos = 32; scroll_pos < lcd_width-32; scroll_pos +=3) {
             lcd_cmd_vertical_scrolling_start_address(scroll_pos);
             // lcd_send_command(MEMORY_WRITE);
-            __delay_cycles(5000);
+            __delay_cycles(20000);
         }
     }
 
@@ -107,7 +107,7 @@ void display_test3() {
 
         memory_coord coord = coord_camera_to_memory(255, scroll_count);
 
-        lcd_cmd_column_set(coord, coord);
+        lcd_cmd_page_set(coord, coord);
         lcd_send_command(MEMORY_WRITE);
         lcd_send_wdata_repeat(colors[scroll_count & 15], 2*lcd_height);
 
@@ -128,7 +128,7 @@ void display_render_new_columns(color_picker fun) {
         world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
 
         memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_column_set(mem_coord, mem_coord);
+        lcd_cmd_page_set(mem_coord, mem_coord);
 
         lcd_send_command(MEMORY_WRITE);
 
@@ -144,7 +144,7 @@ void display_render_new_columns16(color_picker fun) {
         world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
 
         memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_column_set(mem_coord, mem_coord);
+        lcd_cmd_page_set(mem_coord, mem_coord);
 
         lcd_send_command(MEMORY_WRITE);
 
@@ -160,7 +160,7 @@ void display_render_all(color_picker fun) {
         world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
 
         memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_column_set(mem_coord, mem_coord);
+        lcd_cmd_page_set(mem_coord, mem_coord);
 
         lcd_send_command(MEMORY_WRITE);
 
@@ -193,7 +193,7 @@ void display_render_new_columns_metatilemap() {
     __data20_write_long((uintptr_t) &DMA0SA,(uintptr_t) display.buffer);
     DMA0SZ = 480;
     
-    lcd_cmd_page_set(0, 239);
+    lcd_cmd_column_set(0, 239);
 
     for (uint16_t i = pos; i <= 255; i++) {
         temp = TA0R;
@@ -202,7 +202,7 @@ void display_render_new_columns_metatilemap() {
 
         memory_coord mem = coord_camera_to_memory(i, display.scroll_count);
 
-        lcd_cmd_column_set(mem, mem);
+        lcd_cmd_page_set(mem, mem);
 
         const Metatile* metatile_current = metamap_metatile_getref(&metamap1, world_pos, 0);
 
@@ -241,7 +241,7 @@ void display_render_dirty_sprites() {
 
     for (uint8_t i = 0, y = 0; i < 30; i++, y += 8) {
         while(DMA0CTL & DMAEN);
-        lcd_cmd_page_set(y, y+7);
+        lcd_cmd_column_set(y, y+7);
 
         for (int j = 0; j < 4; j++) {
             uint8_t offset_x = j*64;
@@ -258,7 +258,7 @@ void display_render_dirty_sprites() {
                         memory_coord mem = coord_camera_to_memory(x+k, display.scroll_count);
 
                         while(DMA0CTL & DMAEN);
-                        lcd_cmd_column_set(mem, mem);
+                        lcd_cmd_page_set(mem, mem);
 
                         lcd_prepare_data();
                         DMA0CTL |= DMAEN;

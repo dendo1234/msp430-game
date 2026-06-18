@@ -179,9 +179,9 @@ void lcd_cmd_vertical_scrolling_definition(uint16_t tfa, uint16_t vsa, uint16_t 
     lcd_send_wdata(bfa);
 }
 
-void lcd_cmd_memory_access_control(uint8_t parameter) {
+void lcd_cmd_memory_access_control(MADCTL mad) {
     lcd_send_command(MEMORY_ACCESS_CONTROL);
-    lcd_send_data(parameter);
+    lcd_send_data(mad.raw_data);
 }
 
 void lcd_cmd_vertical_scrolling_start_address(uint16_t vsp) {
@@ -238,8 +238,12 @@ void lcd_init() {
     lcd_cmd_pixel_format_set();
     // lcd_cmd_partial_mode();
 
-    lcd_cmd_memory_access_control(0x0 | 0x20 | 0x08 | 0x40); // "landscape" + bgr because I don't know why the colors get fliped  + flip the colum
-    lcd_cmd_column_set(0x20, 0x11F);
+    MADCTL mad = {
+        .fields = {
+            .bgr_order = 1, // I have no ideia why is bgr, not rgb
+        }
+    };
+    lcd_cmd_memory_access_control(mad);
 
     lcd_cmd_vertical_scrolling_definition(32, lcd_width-64, 32);
     lcd_cmd_vertical_scrolling_start_address(0);

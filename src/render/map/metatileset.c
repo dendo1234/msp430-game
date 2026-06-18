@@ -116,10 +116,9 @@ void metatile_col_copy(Metatile metatile, uint16_t* destination, uint8_t x) {
     }
 
     for (int j = 0; j <= 1; j++) {
-        const color* q = tileset_main[tile[j*2]] + x;
+        const color* q = tileset_main[tile[j*2]] + x*8;
         for (int i = 0; i < 8; i++) {
-            *destination++ = *q;
-            q += 8;
+            *destination++ = *q++;
         }
     }
 }

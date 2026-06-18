@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include "coordinates.h"
 
@@ -58,10 +59,30 @@ typedef struct {
     bool booster_voltage_status : 1;
 } ILI9341_status_fields;
 
+static_assert(sizeof(ILI9341_status_fields) == 4, "ILI9341_status_fields wrong size");
+
 typedef union {
     uint32_t raw_data;
     ILI9341_status_fields fields;
 } ILI9341_status;
+
+typedef struct __attribute__((packed)) {
+    unsigned padding : 2;
+    bool horizontal_refresh_order : 1;
+    bool bgr_order : 1;
+    bool vertical_refresh_order : 1;
+    bool row_column_exchange : 1;
+    bool column_address_order : 1;
+    bool row_address_order : 1;
+} MADCTL_fields;
+
+static_assert(sizeof(MADCTL_fields) == 1, "MADCTL_fields wrong size");
+
+typedef union {
+    uint8_t raw_data;
+    MADCTL_fields fields;
+} MADCTL;
+
 
 void lcd_init();
 
