@@ -2,6 +2,9 @@
 #include "display.h"
 #include "ili9341.h"
 #include "coordinates.h"
+#include "map/metatileset.h"
+#include "map/metatilemap.h"
+#include "coordinates.h"
 
 
 display_data display;
@@ -13,7 +16,7 @@ void display_init() {
     display.new_columns = 0;
         
     DMACTL0 = DMA0TSEL_19;
-    DMACTL4 = DMARMWDIS; // makes debugging more stable
+    DMACTL4 = DMARMWDIS; // makes debugging more stable - PS: The debbuggin is still not 100% stable
     DMA0CTL = 0 
       | DMADT_1
       | DMADSTINCR_0
@@ -120,38 +123,6 @@ void display_camera_add(uint16_t x) {
     lcd_cmd_vertical_scrolling_start_address(32+display.scroll_count);
 }
 
-void display_render_new_columns(color_picker fun) {
-    for (int i = 0; i < display.new_columns; i++) {
-        world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
-
-        memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_page_set(mem_coord, mem_coord);
-
-        lcd_send_command(MEMORY_WRITE);
-
-        int j = 240;
-        while (j--) {
-            lcd_send_wdata(fun(coord, j));
-        }
-    }
-}
-
-void display_render_new_columns16(color_picker fun) {
-    for (int i = 0; i < display.new_columns; i++) {
-        world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
-
-        memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_page_set(mem_coord, mem_coord);
-
-        lcd_send_command(MEMORY_WRITE);
-
-        int j = 240/16;
-        while (j--) {
-            lcd_send_wdata_repeat(fun(coord, j), 16);
-        }
-    }
-}
-
 void display_render_all(color_picker fun) {
     for (int i = 0; i <= 255; i++) {
         world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
@@ -168,9 +139,15 @@ void display_render_all(color_picker fun) {
     }
 }
 
-#include "map/metatileset.h"
-#include "map/metatilemap.h"
-#include "coordinates.h"
+color* display_buffer_get() {
+    if (display.current_buffer) {
+        display.current_buffer = 0;
+        return display.buffer[1];
+    } else {
+        display.current_buffer = 1;
+        return display.buffer[0];
+    }
+}
 
 void display_render_new_columns_metatilemap() {
     assert(display.new_columns <= 16);
@@ -187,27 +164,16 @@ void display_render_new_columns_metatilemap() {
     uint16_t temp = 0;
 
     while (DMA0CTL & DMAEN);
-    __data20_write_long((uintptr_t) &DMA0SA,(uintptr_t) display.buffer);
-    DMA0SZ = 480;
-    
     lcd_cmd_column_set(0, 239);
 
     for (uint16_t i = pos; i <= 255; i++) {
-        temp = TA0R;
-        while(DMA0CTL & DMAEN);
-        time_spi += TA0R - temp;
-
         memory_coord mem = coord_camera_to_memory(i, display.scroll_count);
-
-        lcd_cmd_page_set(mem, mem);
 
         const Metatile* metatile_current = metamap_metatile_getref(&metamap1, world_pos, 0);
 
         uint8_t col = world_pos & 0xf;
-        uint16_t* buf = display.buffer;
 
-        lcd_send_command(MEMORY_WRITE);
-
+        uint16_t* buf = display_buffer_get();
 
         for (int i = 0; i < 15; i++) {
             temp = TA0R;
@@ -217,9 +183,21 @@ void display_render_new_columns_metatilemap() {
             buf += 16;
         }
 
+        buf -= 240;
+
         // send buffer
+        temp = TA0R;
+        while (DMA0CTL & DMAEN);
+        lcd_cmd_page_set(mem, mem);
+
+        __data20_write_long((uintptr_t) &DMA0SA,(uintptr_t) buf);
+        DMA0SZ = 480;
+
+        lcd_send_command(MEMORY_WRITE);
+
         lcd_prepare_data();
         DMA0CTL |= DMAEN;
+        time_spi += TA0R - temp;
 
         world_pos++;
     }
@@ -229,10 +207,6 @@ void display_render_new_columns_metatilemap() {
 #include "sprite.h"
 
 void display_render_dirty_sprites() {
-    while (DMA0CTL & DMAEN);
-    __data20_write_long((uintptr_t) &DMA0SA,(uintptr_t) display.buffer);
-    DMA0SZ = 128;
-
     for (uint8_t i = 0, y = 0; i < 30; i++, y += 8) {
         while(DMA0CTL & DMAEN);
         lcd_cmd_column_set(y, y+7);
@@ -253,14 +227,21 @@ void display_render_dirty_sprites() {
                     memory_coord mem1 = coord_world_to_memory(x1, display.scroll_count, display.camera_pos);
                     memory_coord mem2 = coord_world_to_memory(x2, display.scroll_count, display.camera_pos);
 
-                    sprite_render_dirty8x8(display.buffer, x1, y);
+                    uint16_t* buf = display_buffer_get();
 
+                    sprite_render_dirty8x8(buf, x1, y);
+
+                    display.dirty_8x8[j][i] &= ~index;
+
+                    while (DMA0CTL & DMAEN);
+                    __data20_write_long((uintptr_t)&DMA0SA, (uintptr_t)buf);
+
+                    // send buffer
                     if (mem1 > mem2) {
-                        while (DMA0CTL & DMAEN);
+                        lcd_cmd_page_set(mem1, 287);
+
                         uint8_t bytes = (288 - mem1) * 16;
                         DMA0SZ = bytes;
-
-                        lcd_cmd_page_set(mem1, 287);
                         lcd_send_command(MEMORY_WRITE);
 
                         lcd_prepare_data();
@@ -268,28 +249,24 @@ void display_render_dirty_sprites() {
 
                         // part 2
                         while (DMA0CTL & DMAEN);
-                        __data20_write_long((uintptr_t)&DMA0SA, (uintptr_t)((uint8_t*)display.buffer + bytes));
-                        DMA0SZ = 128 - bytes;
 
                         lcd_cmd_page_set(32, mem2);
+                        __data20_write_long((uintptr_t)&DMA0SA, (uintptr_t)((uint8_t*)buf + bytes));
+
+                        DMA0SZ = 128 - bytes;
                         lcd_send_command(MEMORY_WRITE);
 
                         lcd_prepare_data();
                         DMA0CTL |= DMAEN;
-
-                        // return back to normal
-                        while (DMA0CTL & DMAEN);
-                        __data20_write_long((uintptr_t)&DMA0SA, (uintptr_t)display.buffer);
-                        DMA0SZ = 128;
                     } else {
                         lcd_cmd_page_set(mem1, mem2);
+
+                        DMA0SZ = 128;
                         lcd_send_command(MEMORY_WRITE);
 
                         lcd_prepare_data();
                         DMA0CTL |= DMAEN;
-
                     }
-                    display.dirty_8x8[j][i] &= ~index;
                 }
                 index = index << 1;
                 offset2_x++;
@@ -300,17 +277,6 @@ void display_render_dirty_sprites() {
 
 world_coord display_get_camera_pos() {
     return display.camera_pos;
-}
-
-color test_color_picker(world_coord x, uint8_t y) {
-    static const color colors[] = {
-        0x001f,
-        0x07E0,
-        0xF100,
-        0xffff,
-    };
-
-    return colors[(x >> 2) & 3];
 }
 
 void display_set_dirty(Box* box) {

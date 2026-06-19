@@ -47,6 +47,8 @@ void main (void)
     volatile uint16_t frame_max = 0;
 
     // display_render_all(tilemap_color_picker);
+    PMM_setVCore(PMM_CORE_LEVEL_2);
+    overclock();
 
     sprite_manager.sprite_slots[0] = &sprite_mario;
     sprite_manager.background = &metamap1;
@@ -86,7 +88,7 @@ void main (void)
         frame_max = frame_duration > frame_max ? frame_duration : frame_max;
         if (frame_duration < FRAME_TARGET-100 && !(TA0CTL & TAIFG)) {
             SLEEP_LED_ON;
-            // __bis_SR_register(LPM0_bits + GIE); // enter low power mode
+            __bis_SR_register(LPM0_bits + GIE); // enter low power mode
         }
     }
 }
