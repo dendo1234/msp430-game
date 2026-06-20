@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <assert.h>
 
-#define SMCLK_FREQUENCY 1048576
-#define ACLK_FREQUENCY 32768
+static const uint32_t SMCLK_FREQUENCY = 1048576l * 8;
+static const uint16_t ACLK_FREQUENCY = 32768;
 
 static const uint32_t DCOCLKDIV_TARGET = 1l << 24; // 16 MHz
 static const uint16_t REFOCLK = 1l << 15;

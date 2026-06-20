@@ -36,4 +36,5 @@ world_coord display_get_camera_pos();
 
 color test_color_picker(world_coord x, uint8_t y); 
 
-void display_set_dirty(Box* box);
+void display_set_dirty(Bounds* box);
+void display_set_dirty_meta(MetaSprite* meta);

@@ -29,28 +29,40 @@ typedef struct {
     world_coord x2;
     uint8_t y1;
     uint8_t y2;
-} Box;
+} Bounds;
 
 typedef struct {
-    Sprite8x8* data;
-    Box box;
+    world_coord x;
+    uint8_t y;
+    uint8_t w;
+    uint8_t h;
+} Rect;
+
+typedef struct {
+    world_coord x;
+    uint8_t y;
+} Offset;
+
+typedef struct {
+    const Sprite8x8* data;
+    Offset offset;
     bool flip;
     bool render;
 } Sprite;
 
-// typedef struct {
-//     Box box;
-//     uint8_t width;
-//     bool flip;
-//     uint8_t sprite_count;
-//     Sprite sprites[]
-// } MetaSprite;
+typedef struct {
+    Rect box;
+    bool flip;
+    bool render;
+    uint8_t sprite_count;
+    Sprite sprites[];
+} MetaSprite;
 
 
 static const uint8_t sprite_slots_count = 8;
 
 typedef struct {
-    Sprite* sprite_slots[sprite_slots_count];
+    MetaSprite* sprite_slots[sprite_slots_count];
     const MetaMap* background;
     uint8_t used_slots;
 
@@ -62,12 +74,8 @@ extern SpriteManager sprite_manager;
 index_x: (0:15)
 index_y: (0:14)
 */
+
 void sprite_render_dirty8x8(uint16_t* destination, world_coord tile_x1, uint8_t y);
 
-bool sprite_check_inside(Box* box, world_coord x, uint8_t y);
-bool sprite_check_inside_8x8(Box* box, uint8_t index_x, uint8_t index_y);
-
-void sprite_render_column(uint16_t* destination, world_coord x, uint8_t y);
-
-void sprite_ret_copy(uint16_t* destination, Sprite* sprite, Box* src_box, Box* dst_box);
-void sprite_set_dirty(uint8_t dirty[4][30], Box* box);
+void sprite_set_dirty(uint8_t dirty[4][30], Bounds* box);
+void metasprite_set_dirty(uint8_t dirty[4][30], MetaSprite* meta);

@@ -7,7 +7,8 @@
 #include "clocks.h"
 #include "render/sprite_pool.h"
 
-#define FRAME_TARGET ((SMCLK_FREQUENCY/1 /* timer divider */)*0.016667) //60 fps
+const uint8_t MAIN_CLK_DIVIDER_POWER = 3; // 2^x
+const uint16_t FRAME_TARGET = (SMCLK_FREQUENCY/(1 << MAIN_CLK_DIVIDER_POWER))*0.016667; //60 fps
 
 #define WORK_LED_ON P1OUT |= BIT0
 #define WORK_LED_OFF P1OUT &= ~BIT0
@@ -23,7 +24,7 @@ void main (void)
 
     display_init();
 
-    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | ID__8 | TACLR;
+    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | (ID__1 * MAIN_CLK_DIVIDER_POWER) | TACLR;
     TA0CCTL1 = CCIE;
     TA0CCR1 = FRAME_TARGET;
     
@@ -47,10 +48,10 @@ void main (void)
     volatile uint16_t frame_max = 0;
 
     // display_render_all(tilemap_color_picker);
-    PMM_setVCore(PMM_CORE_LEVEL_2);
-    overclock();
+    // PMM_setVCore(PMM_CORE_LEVEL_2);
+    // overclock();
 
-    sprite_manager.sprite_slots[0] = &sprite_mario;
+    sprite_manager.sprite_slots[0] = &metasprite_mario;
     sprite_manager.background = &metamap1;
 
     __enable_interrupt();
@@ -76,7 +77,7 @@ void main (void)
 
         display_render_new_columns_metatilemap();
 
-        display_set_dirty(&sprite_mario.box);
+        display_set_dirty_meta(&metasprite_mario);
 
         display_render_dirty_sprites();
 
