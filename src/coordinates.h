@@ -111,6 +111,7 @@ inline memory_coord coord_camera_to_memory(camera_coord x, uint8_t scroll_count)
     camera_pos: position of the leftmost visible in screen on world space
 */
 inline memory_coord coord_world_to_memory(world_coord x, uint8_t scroll_count, world_coord camera_pos) {
+    assert(coord_cull(x, camera_pos));
     return (uint16_t)(uint8_t)(x-camera_pos+scroll_count) + 32;
 }
 

@@ -1,10 +1,13 @@
 #include <driverlib.h>
 
+#include "adc.h"
 #include "audio.h"
+#include "clocks.h"
+#include "coordinates.h"
+#include "gameobject.h"
+#include "gameobject_pool.h"
 #include "musics.h"
 #include "render/display.h"
-#include "coordinates.h"
-#include "clocks.h"
 #include "render/sprite_pool.h"
 
 const uint8_t MAIN_CLK_DIVIDER_POWER = 3; // 2^x
@@ -23,6 +26,8 @@ void main (void)
     // audio_data_init();
 
     display_init();
+
+    adc_init();
 
     TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | (ID__1 * MAIN_CLK_DIVIDER_POWER) | TACLR;
     TA0CCTL1 = CCIE;
@@ -51,8 +56,8 @@ void main (void)
     // PMM_setVCore(PMM_CORE_LEVEL_2);
     // overclock();
 
-    sprite_manager.sprite_slots[0] = &metasprite_mario;
     sprite_manager.background = &metamap1;
+    go_spawn(&go_mario);
 
     __enable_interrupt();
     while(1) {
@@ -64,6 +69,8 @@ void main (void)
 
         WORK_LED_ON;
         // Frame
+        adc_start_conversion();
+
         if (!(P2IN & BIT1)) {
             // s1 Pressed
             audio_channel_music_set(TWO, &teste_theme);
@@ -73,12 +80,18 @@ void main (void)
 
         }
 
-        display_camera_add(3);
+        ADC_result joystick = adc_read();
+
+        go_mario.velocity.x.raw = (int32_t)joystick.x * (0x500l); // 2.5 pixels per frame
+        go_mario.velocity.y.raw = (int32_t)joystick.y * (0x500l); // 2.5 pixels per frame
+
+        uint8_t camera_delta = go_calculate_camera_delta(&go_mario);
+        display_camera_add(camera_delta);
+
+        go_pool_update();
 
         display_render_new_columns_metatilemap();
-
         display_set_dirty_meta(&metasprite_mario);
-
         display_render_dirty_sprites();
 
         //Frame end

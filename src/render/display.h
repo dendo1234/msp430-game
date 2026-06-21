@@ -10,7 +10,12 @@ typedef struct {
     uint8_t new_columns;
     color buffer[2][256];
     uint8_t current_buffer;
-    uint8_t dirty_8x8[4][30]; // each bit symbolizes that the renderer should update the given 8x8
+    // each bit means that the renderer should rerender the world tile at the given index + camera offset
+    //
+    // One consequence is that since there can be more than 32 world tiles in view on the horizontal axis
+    // (31 "full tiles" + 2 partial at the begining and end)
+    // is that the last tile in view horizontaly is not tracked
+    uint8_t dirty_8x8[4][30];
 } display_data;
 
 

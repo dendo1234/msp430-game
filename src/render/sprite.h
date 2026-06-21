@@ -79,3 +79,5 @@ void sprite_render_dirty8x8(uint16_t* destination, world_coord tile_x1, uint8_t 
 
 void sprite_set_dirty(uint8_t dirty[4][30], Bounds* box);
 void metasprite_set_dirty(uint8_t dirty[4][30], MetaSprite* meta);
+
+bool spritemanager_add_metasprite(MetaSprite* meta);

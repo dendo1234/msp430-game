@@ -221,17 +221,26 @@ void display_render_dirty_sprites() {
                 if (display.dirty_8x8[j][i] & index) {
                     // process
                     camera_coord camera_x = offset_x + offset2_x*8;
+
                     world_coord x1 = coord_camera_to_world(camera_x, display.camera_pos) & ~0x7;
                     world_coord x2 = x1 + 7;
 
-                    memory_coord mem1 = coord_world_to_memory(x1, display.scroll_count, display.camera_pos);
-                    memory_coord mem2 = coord_world_to_memory(x2, display.scroll_count, display.camera_pos);
-
                     uint16_t* buf = display_buffer_get();
-
                     sprite_render_dirty8x8(buf, x1, y);
 
-                    display.dirty_8x8[j][i] &= ~index;
+                    memory_coord mem1;
+                    memory_coord mem2 = coord_world_to_memory(x2, display.scroll_count, display.camera_pos);
+
+                    if (camera_x != 0) {
+                        //todo
+                        mem1 = coord_world_to_memory(x1, display.scroll_count, display.camera_pos);
+                    } else {
+                        // we are in trouble
+
+                        // in sumary, it is necessary to change DMA0SA and DMA0SZ to not render full 8x8
+                        // too much wastle to properly fix this for a somewhat rare bug
+                        mem1 = coord_camera_to_memory(0, display.scroll_count);
+                    }
 
                     while (DMA0CTL & DMAEN);
                     __data20_write_long((uintptr_t)&DMA0SA, (uintptr_t)buf);
@@ -267,6 +276,8 @@ void display_render_dirty_sprites() {
                         lcd_prepare_data();
                         DMA0CTL |= DMAEN;
                     }
+
+                    display.dirty_8x8[j][i] &= ~index;
                 }
                 index = index << 1;
                 offset2_x++;

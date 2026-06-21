@@ -7,7 +7,7 @@ bool sprite_check_inside(Rect* check, world_coord tile_x1, world_coord tile_x2) 
     world_coord x1 = check->x;
     world_coord x2 = x1 + check->w - 1;
 
-    return (x1 >= tile_x1 && x1 <= tile_x2) || (x2 >= tile_x1 && x2 <= tile_x2);
+    return (x1 >= tile_x1 && x1 <= tile_x2) || (x2 >= tile_x1 && x2 <= tile_x2) || (x1 <= tile_x1 && x2 >= tile_x2);
 }
 
 void sprite_ret_copy(uint16_t* destination, Sprite* sprite, Bounds* src_box, Bounds* dst_box) {
@@ -121,22 +121,21 @@ void sprite_render_dirty8x8(uint16_t* destination, world_coord tile_x1, uint8_t 
 
 void sprite_set_dirty(uint8_t dirty[4][30], Bounds* box) {
     world_coord camera_pos = display_get_camera_pos();
+    world_coord camera_tile_offset = camera_pos >> 3;
     uint8_t y1 = box->y1 >> 3;
     uint8_t y2 = box->y2 >> 3;
     if (coord_cull(box->x1, camera_pos)) {
-        camera_coord x = coord_world_to_camera(box->x1, camera_pos);
-        uint8_t tile_x = x >> 3;
+        uint8_t tile_x = (box->x1 >> 3) - camera_tile_offset;
 
-        dirty[tile_x >> 3][y1] |= 1 << ((tile_x & 0x7) + 1);
-        dirty[tile_x >> 3][y2] |= 1 << ((tile_x & 0x7) + 1);
+        dirty[tile_x >> 3][y1] |= 1 << (tile_x & 0x7);
+        dirty[tile_x >> 3][y2] |= 1 << (tile_x & 0x7);
     }
 
     if (coord_cull(box->x2, camera_pos)) {
-        camera_coord x = coord_world_to_camera(box->x2, camera_pos);
-        uint8_t tile_x = x >> 3;
+        uint8_t tile_x = (box->x2 >> 3) - camera_tile_offset;
 
-        dirty[tile_x >> 3][y1] |= 1 << ((tile_x & 0x7) + 1);
-        dirty[tile_x >> 3][y2] |= 1 << ((tile_x & 0x7) + 1);
+        dirty[tile_x >> 3][y1] |= 1 << (tile_x & 0x7);
+        dirty[tile_x >> 3][y2] |= 1 << (tile_x & 0x7);
     }
 }
 
@@ -163,4 +162,14 @@ void metasprite_set_dirty(uint8_t dirty[4][30], MetaSprite* meta) {
 
         sprite_set_dirty(dirty, &box);
     }
+}
+
+bool spritemanager_add_metasprite(MetaSprite* meta) {
+    for (int i = 0; i < sprite_slots_count; i++) {
+        if (!sprite_manager.sprite_slots[i]) {
+            sprite_manager.sprite_slots[i] = meta;
+            return true;
+        }
+    }
+    return false;
 }
