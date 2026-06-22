@@ -9,6 +9,10 @@ Metatile metamap_metatile_get(const MetaMap* meta_map, world_coord x, uint8_t y)
     return meta_map->tiles[tile_coord_x + tile_coord_y * meta_map->width].tile;
 }
 
+Metatile metamap_metatile_get2(const MetaMap* meta_map, world_coord tile_x, uint8_t tile_y) {
+    return meta_map->tiles[tile_x + tile_y * meta_map->width].tile;
+}
+
 Tile metamap_tile_get(const MetaMap* meta_map, world_coord x, uint8_t y) {
     uint16_t tile_x = x & 0x7;
     uint8_t tile_y = y & 0x7;

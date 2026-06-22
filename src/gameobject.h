@@ -33,7 +33,16 @@ typedef struct {
     MetaSprite* metasprite;
 } GameObject;
 
+
 static const uint8_t gameobject_count = 8;
+
+typedef struct {
+    const MetaMap* colision_map;
+    GameObject* pool[gameobject_count];
+
+} GameObjectManager;
+
+extern GameObjectManager go_manager;
 
 bool go_spawn(GameObject* go);
 void go_pool_update();

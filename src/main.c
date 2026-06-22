@@ -29,7 +29,7 @@ void main (void)
 
     adc_init();
 
-    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | (ID__1 * MAIN_CLK_DIVIDER_POWER) | TACLR;
+    TA0CTL = TASSEL__SMCLK | MC__CONTINOUS | (ID_1 * MAIN_CLK_DIVIDER_POWER) | TACLR;
     TA0CCTL1 = CCIE;
     TA0CCR1 = FRAME_TARGET;
     
@@ -52,11 +52,13 @@ void main (void)
     int delta_time = 0;
     volatile uint16_t frame_max = 0;
 
-    // display_render_all(tilemap_color_picker);
-    // PMM_setVCore(PMM_CORE_LEVEL_2);
-    // overclock();
+    PMM_setVCore(PMM_CORE_LEVEL_2);
+    overclock();
+
+    display_render_all();
 
     sprite_manager.background = &metamap1;
+    go_manager.colision_map = &metamap1;
     go_spawn(&go_mario);
 
     __enable_interrupt();

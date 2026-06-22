@@ -123,20 +123,9 @@ void display_camera_add(uint16_t x) {
     lcd_cmd_vertical_scrolling_start_address(32+display.scroll_count);
 }
 
-void display_render_all(color_picker fun) {
-    for (int i = 0; i <= 255; i++) {
-        world_coord coord = coord_camera_to_world(255-i, display.camera_pos);
-
-        memory_coord mem_coord = coord_camera_to_memory(255-i, display.scroll_count);
-        lcd_cmd_page_set(mem_coord, mem_coord);
-
-        lcd_send_command(MEMORY_WRITE);
-
-        int j = 240;
-        while (j--) {
-            lcd_send_wdata(fun(coord, j));
-        }
-    }
+void display_render_all() {
+    display.new_columns = 255;
+    display_render_new_columns_metatilemap();
 }
 
 color* display_buffer_get() {
@@ -150,7 +139,7 @@ color* display_buffer_get() {
 }
 
 void display_render_new_columns_metatilemap() {
-    assert(display.new_columns <= 16);
+    // assert(display.new_columns <= 16);
 
     if (display.new_columns == 0) {
         return;

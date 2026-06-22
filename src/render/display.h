@@ -31,7 +31,7 @@ void display_reset();
 void display_camera_add(uint16_t x);
 void display_render_new_columns(color_picker fun);
 void display_render_new_columns16(color_picker fun);
-void display_render_all(color_picker fun);
+void display_render_all();
 
 color* display_buffer_get();
 
