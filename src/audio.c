@@ -30,10 +30,19 @@ void audio_data_init() {
     P2SEL |= BIT4;
 
 
-    audio_data_ref.one.music_current = mario_theme;
+    audio_data_ref.one.music_current = &music_intro;
     audio_data_ref.one.note_index = 0;
     audio_data_ref.one.note_repetitions = 0;
+
+    music_intro.next = &music_theme_a;
+    music_theme_a.next = &music_theme_b;
+    music_theme_b.next = &music_theme_c;
+    music_theme_c.next = &music_theme_a;
 }
+
+// void audio_update_music() {
+//     channel_data* channel = &audio_data_ref.one;
+// }
 
 void audio_channel_tone_set(channel_index index, useconds wave_lenght) {
     switch (index) {
@@ -50,12 +59,12 @@ void audio_channel_tone_set(channel_index index, useconds wave_lenght) {
     }
 }
 
-void audio_channel_music_set(channel_index index, music *music) {
+void audio_channel_music_set(channel_index index, music *m) {
     switch (index) {
         case ONE:
-        audio_data_ref.one.music_current = *music;
+        audio_data_ref.one.music_current = m;
         case TWO:
-        audio_data_ref.two.music_current = *music;
+        audio_data_ref.two.music_current = m;
     }
 }
 
@@ -65,15 +74,19 @@ __interrupt void audio_isr() {
     switch (__even_in_range(TB0IV, 14)) {
         case TB0IV_TBCCR1:
         channel = &audio_data_ref.one;
-        channel->note_index = channel->note_index + 1 >= channel->music_current.size ? 0 : channel->note_index + 1;
-        audio_channel_tone_set(ONE, channel->music_current.notes[channel->note_index].wave_lenght);
-        TBCCR1 = TBR + channel->music_current.notes[channel->note_index].duration;
+        if (channel->note_index >= channel->music_current->size) {
+            channel->note_index = 0;
+            channel->music_current = channel->music_current->next;
+        }
+        audio_channel_tone_set(ONE, channel->music_current->notes[channel->note_index].wave_lenght);
+        TBCCR1 = TBR + channel->music_current->notes[channel->note_index].duration;
+        channel->note_index++;
         break;
         case TB0IV_TBCCR2:
         channel = &audio_data_ref.two;
-        channel->note_index = channel->note_index + 1 >= channel->music_current.size ? 0 : channel->note_index + 1;
-        audio_channel_tone_set(TWO, channel->music_current.notes[channel->note_index].wave_lenght);
-        TBCCR2 = TBR + channel->music_current.notes[channel->note_index].duration;
+        channel->note_index = channel->note_index + 1 >= channel->music_current->size ? 0 : channel->note_index + 1;
+        audio_channel_tone_set(TWO, channel->music_current->notes[channel->note_index].wave_lenght);
+        TBCCR2 = TBR + channel->music_current->notes[channel->note_index].duration;
         break;
         default:
         break;

@@ -24,7 +24,7 @@ void main (void)
 {
     WDTCTL = WDTPW | WDTHOLD;
 
-    // audio_data_init();
+    audio_data_init();
 
     display_init();
 
@@ -56,7 +56,7 @@ void main (void)
     PMM_setVCore(PMM_CORE_LEVEL_2);
     overclock();
 
-    display_render_all();
+    // display_render_all();
 
     sprite_manager.background = &metamap1;
     go_manager.colision_map = &metamap1;
@@ -76,7 +76,7 @@ void main (void)
 
         if (!(P2IN & BIT1)) {
             // s1 Pressed
-            audio_channel_music_set(TWO, &teste_theme);
+            // audio_channel_music_set(TWO, &teste_theme);
         }
         if (!(P1IN & BIT1)) {
             // s2 Pressed

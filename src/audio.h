@@ -19,14 +19,17 @@ typedef struct note {
 #define NOTE(_frequency, _duration_rounded_s) (const note){ .wave_lenght = TIMER_A_CLK_FREQUENCY/_frequency, .duration = double_to_ticks(_duration_rounded_s)}
 #define NOTE_SILENCE(_duration_rounded_s) NOTE(20000, _duration_rounded_s)
 
-typedef struct {
+struct Music_temp;
+
+typedef struct Music_temp {
     note const * notes;
     int size;
+    struct Music_temp* next;
 } music;
 
 typedef struct {
-    music music_current;
-    music music_next;
+    music* music_current;
+    music* music_next;
     int note_index;
     int note_repetitions;
 } channel_data;
@@ -39,6 +42,7 @@ typedef enum {
 typedef struct {
     channel_data one;
     channel_data two;
+    uint8_t main_theme_index;
 } audio_data;
 
 
