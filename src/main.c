@@ -7,6 +7,7 @@
 #include "gameobject.h"
 #include "gameobject_pool.h"
 #include "musics.h"
+#include "mario.h"
 #include "render/display.h"
 #include "render/sprite_pool.h"
 
@@ -44,9 +45,9 @@ void main (void)
     P2REN |= BIT1;
     P2OUT |= BIT1;
     //s2
-    P1DIR &= ~BIT1;
-    P1REN |= BIT1;
-    P1OUT |= BIT1;
+    P1DIR &= ~(BIT1 | BIT2 | BIT3);
+    P1REN |= BIT1 | BIT2 | BIT3;
+    P1OUT |= BIT1 | BIT2 | BIT3;
 
     uint16_t frame_start = 0;
     int delta_time = 0;
@@ -83,9 +84,11 @@ void main (void)
         }
 
         ADC_result joystick = adc_read();
+        if (!(P1IN & BIT2)) {
+            joystick.y = -128;
+        }
+        mario_move(joystick, !(P1IN & BIT3));
 
-        go_mario.velocity.x.raw = (int32_t)joystick.x * (0x500l); // 2.5 pixels per frame
-        go_mario.velocity.y.raw = (int32_t)joystick.y * (0x500l); // 2.5 pixels per frame
 
         uint8_t camera_delta = go_calculate_camera_delta(&go_mario);
         display_camera_add(camera_delta);

@@ -1,3 +1,4 @@
+#pragma once
 void adc_init();
 
 void adc_start_conversion();

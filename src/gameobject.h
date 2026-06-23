@@ -31,6 +31,7 @@ typedef struct {
     Vector2 pos;
     Vector2 velocity;
     MetaSprite* metasprite;
+    bool isGrounded;
 } GameObject;
 
 

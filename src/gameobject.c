@@ -48,12 +48,14 @@ void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
     uint8_t metatile_y1 = box->y >> 4;
     uint8_t metatile_y2 = (box->y + box->h-1) >> 4;
 
+    go->isGrounded = false;
     if (delta_y > 0) {
         // check bottom
         for (int i = metatile_x1; i <= metatile_x2; i++) {
             Metatile meta = metamap_metatile_get2(go_manager.colision_map, i, metatile_y2);
             if (meta > META_SKY) {
                 go->pos.y.position = go->pos.y.position & ~0xf; // go up
+                go->isGrounded = true;
                 break;
             }
         }
@@ -108,6 +110,12 @@ void go_update(GameObject* go) {
 
     world_coord old_x = go->pos.x.position;
     uint8_t old_y = go->pos.y.position;
+    
+    go->velocity.y.raw += 0x10000;
+
+    if (go->velocity.y.raw > 0x40000) {
+        go->velocity.y.raw = 0x40000;
+    }
 
     go->pos.x.raw += go->velocity.x.raw;
     go->pos.y.raw += go->velocity.y.raw;
