@@ -9,7 +9,10 @@ typedef Tile Tile16x16[4];
 typedef enum __attribute__((packed)) {
     META_EMPTY = 0,
     META_SKY = 1,
-    META_BRICK = 2,
+    META_BROKEN = 2,
+    META_QUESTION = 3,
+    META_BRICK = 4,
+    META_BLOCK = 5,
     Metatile_Count
 } Metatile;
 

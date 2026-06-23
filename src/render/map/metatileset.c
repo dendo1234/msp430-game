@@ -11,6 +11,19 @@ const MetatileSet metatileset_main = {
         TILE_BRICK, TILE_BRICK,
         TILE_BRICK, TILE_BRICK
     },
+    [META_BROKEN] = {
+        TILE_BROKEN1, TILE_BROKEN2,
+        TILE_BROKEN3, TILE_BROKEN4
+    },
+    [META_BLOCK] = {
+        TILE_BLOCK0, TILE_BLOCK1,
+        TILE_BLOCK2, TILE_BLOCK3
+    },
+    [META_QUESTION] = {
+        TILE_QUESTION0, TILE_QUESTION1,
+        TILE_QUESTION2, TILE_QUESTION3
+    },
+
 };
 
 Tile metatile_tile_get(Metatile metatile, world_coord x, uint8_t y) {
