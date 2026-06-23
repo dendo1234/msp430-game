@@ -210,7 +210,7 @@ static const note mario_theme_b[] = {
     NOTE_SILENCE(0.15),                       // Rest
     NOTE(NOTE_D5, 0.10), NOTE_SILENCE(0.05),  // D5
     NOTE_SILENCE(0.30),                       // Rest
-    NOTE(NOTE_C5, 0.20), NOTE_SILENCE(0.10)   // C5
+    NOTE(NOTE_C5, 0.20), NOTE_SILENCE(0.40)   // C5
 };
 
 // Size helper
@@ -222,16 +222,64 @@ static music music_theme_b = {
 };
 
 static const note mario_theme_c[] = {
-    // Measure 19 - The repetitive syncopated C5s
+    // Measure 19 - The E5 C5 G4 drop
+    NOTE(NOTE_E5, 0.20), NOTE_SILENCE(0.10),  // E5 (Quarter)
     NOTE(NOTE_C5, 0.10), NOTE_SILENCE(0.05),  // C5 (Eighth)
-    NOTE(NOTE_C5, 0.10), NOTE_SILENCE(0.20),  // C5 (Delayed)
-    NOTE(NOTE_C5, 0.10), NOTE_SILENCE(0.20),  // C5 (Delayed)
-    NOTE_SILENCE(0.15),                       // Rest
+    NOTE_SILENCE(0.15),
+    NOTE(NOTE_G4, 0.10), NOTE_SILENCE(0.05),  // G4 (Quarter)
+    NOTE_SILENCE(0.20),                       // Rest (Quarter)
+    NOTE(NOTE_GS4, 0.20), NOTE_SILENCE(0.10), // G#4 (Eighth pickup)
 
-    // Measure 20 - The walk up to resolve
+    // Measure 20 - A4 F5 walk
+    NOTE(NOTE_A4, 0.20), NOTE_SILENCE(0.10),  // A4 (Quarter)
+    NOTE(NOTE_F5, 0.20), NOTE_SILENCE(0.10),  // F5 (Quarter)
+    NOTE(NOTE_F5, 0.20), NOTE_SILENCE(0.10),  // F5 (Quarter)
+    NOTE(NOTE_A4, 0.10), NOTE_SILENCE(0.05),  // A4 (Eighth)
+    NOTE(NOTE_B4, 0.10), NOTE_SILENCE(0.05),  // B4 (Eighth)
+
+    // Measure 21 - The syncopated A5s
+    NOTE_SILENCE(0.15),                       // Rest (Eighth)
+    NOTE(NOTE_A5, 0.10), NOTE_SILENCE(0.05),  // A5 (Eighth)
+    NOTE_SILENCE(0.15),                       // Rest (Eighth)
+    NOTE(NOTE_A5, 0.10), NOTE_SILENCE(0.05),  // A5 (Eighth)
+    NOTE_SILENCE(0.15),                       // Rest (Eighth)
+    NOTE(NOTE_A5, 0.10), NOTE_SILENCE(0.05),  // A5 (Eighth)
+    NOTE(NOTE_G5, 0.10), NOTE_SILENCE(0.05),  // G5 (Eighth)
+    NOTE(NOTE_F5, 0.10), NOTE_SILENCE(0.05),  // F5 (Eighth)
+
+    // Measure 22 - The run down
+    NOTE(NOTE_E5, 0.20), NOTE_SILENCE(0.10),  // E5 (Quarter)
+    NOTE(NOTE_C5, 0.20), NOTE_SILENCE(0.10),  // C5 (Quarter)
+    NOTE(NOTE_A4, 0.20), NOTE_SILENCE(0.10),  // A4 (Quarter)
+    NOTE(NOTE_G4, 0.20), NOTE_SILENCE(0.10),  // G4 (Quarter)
+
+    // Measure 23 - E5 C5 G4 (Repeat)
+    NOTE(NOTE_E5, 0.20), NOTE_SILENCE(0.10),  // E5 (Quarter)
     NOTE(NOTE_C5, 0.10), NOTE_SILENCE(0.05),  // C5 (Eighth)
-    NOTE(NOTE_D5, 0.10), NOTE_SILENCE(0.20),  // D5
-    NOTE(NOTE_E5, 0.20), NOTE_SILENCE(0.40)   // E5 (Quarter held out to resolve the loop)
+    NOTE(NOTE_G4, 0.20), NOTE_SILENCE(0.10),  // G4 (Quarter)
+    NOTE_SILENCE(0.30),                       // Rest (Quarter)
+    NOTE(NOTE_GS4, 0.10), NOTE_SILENCE(0.05), // G#4 (Eighth pickup)
+
+    // Measure 24 - A4 F5 (Repeat)
+    NOTE(NOTE_A4, 0.20), NOTE_SILENCE(0.10),  // A4 (Quarter)
+    NOTE(NOTE_F5, 0.20), NOTE_SILENCE(0.10),  // F5 (Quarter)
+    NOTE(NOTE_F5, 0.20), NOTE_SILENCE(0.10),  // F5 (Quarter)
+    NOTE(NOTE_A4, 0.10), NOTE_SILENCE(0.05),  // A4 (Eighth)
+    NOTE(NOTE_B4, 0.10), NOTE_SILENCE(0.05),  // B4 (Eighth)
+
+    // Measure 25 - The syncopated F5s (Alternate ending)
+    NOTE_SILENCE(0.15),                       // Rest (Eighth)
+    NOTE(NOTE_F5, 0.10), NOTE_SILENCE(0.05),  // F5 (Eighth)
+    NOTE_SILENCE(0.15),                       // Rest (Eighth)
+    NOTE(NOTE_F5, 0.10), NOTE_SILENCE(0.05),  // F5 (Eighth)
+    NOTE_SILENCE(0.15),                       // Rest (Eighth)
+    NOTE(NOTE_F5, 0.10), NOTE_SILENCE(0.05),  // F5 (Eighth)
+    NOTE(NOTE_E5, 0.10), NOTE_SILENCE(0.05),  // E5 (Eighth)
+    NOTE(NOTE_D5, 0.10), NOTE_SILENCE(0.05),  // D5 (Eighth)
+
+    // Measure 26 - Final Resolution
+    NOTE(NOTE_C5, 0.20), NOTE_SILENCE(0.10),  // C5 (Quarter)
+    NOTE_SILENCE(0.90)                        // Rest (3 Quarter notes to finish out the measure)
 };
 
 // Size helper
@@ -239,5 +287,5 @@ static const note mario_theme_c[] = {
 
 static music music_theme_c = {
     .notes = mario_theme_c,
-    .size = MARIO_THEME_B_SIZE
+    .size = MARIO_THEME_C_SIZE
 };
