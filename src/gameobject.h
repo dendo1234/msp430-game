@@ -27,11 +27,16 @@ typedef struct {
     PosY y;
 } Vector2;
 
-typedef struct {
+typedef struct GameObject {
     Vector2 pos;
     Vector2 velocity;
-    MetaSprite* metasprite;
+    const MetaSprite* metasprite;
+    Rect box;
     bool isGrounded;
+    bool isAlive;
+    bool render;
+    void (*custom_function)(struct GameObject* go);
+    void (*late_update)(struct GameObject* go);
 } GameObject;
 
 
@@ -39,7 +44,7 @@ static const uint8_t gameobject_count = 8;
 
 typedef struct {
     const MetaMap* colision_map;
-    GameObject* pool[gameobject_count];
+    GameObject pool[gameobject_count];
 
 } GameObjectManager;
 

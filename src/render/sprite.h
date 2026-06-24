@@ -51,7 +51,6 @@ typedef struct {
 } Sprite;
 
 typedef struct {
-    Rect box;
     bool flip;
     bool render;
     uint8_t sprite_count;
@@ -77,7 +76,9 @@ index_y: (0:14)
 
 void sprite_render_dirty8x8(uint16_t* destination, world_coord tile_x1, uint8_t y);
 
-void sprite_set_dirty(uint8_t dirty[4][30], Bounds* box);
-void metasprite_set_dirty(uint8_t dirty[4][30], MetaSprite* meta);
+struct GameObject;
 
-bool spritemanager_add_metasprite(MetaSprite* meta);
+void sprite_set_dirty(uint8_t dirty[4][30], Bounds* box);
+void metasprite_set_dirty(uint8_t dirty[4][30], struct GameObject* meta);
+
+// bool spritemanager_add_metasprite(const MetaSprite* meta);

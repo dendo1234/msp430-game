@@ -289,3 +289,28 @@ static music music_theme_c = {
     .notes = mario_theme_c,
     .size = MARIO_THEME_C_SIZE
 };
+
+static const note sfx_jump[] = {
+    // Rapidly stepping up the frequency every 0.02 seconds
+    // Starting around a G4 and sweeping up past an E6
+    NOTE(392, 0.02),
+    NOTE(440, 0.02),
+    NOTE(494, 0.02),
+    NOTE(554, 0.02),
+    NOTE(622, 0.02),
+    NOTE(698, 0.02),
+    NOTE(784, 0.02),
+    NOTE(880, 0.02),
+    NOTE(988, 0.02),
+    NOTE(1109, 0.02),
+    NOTE(1245, 0.02),
+    NOTE(1397, 0.02)
+};
+
+// Size helper for the sound effect
+#define SFX_JUMP_SIZE (sizeof(sfx_jump) / sizeof(sfx_jump[0]))
+
+static music music_jump = {
+    .notes = sfx_jump,
+    .size = SFX_JUMP_SIZE
+};

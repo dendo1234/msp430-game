@@ -5,15 +5,15 @@ GameObjectManager go_manager;
 
 bool go_spawn(GameObject* go) {
     for (int i = 0; i < gameobject_count; i++) {
-        if (!go_manager.pool[i]) {
+        if (!go_manager.pool[i].isAlive) {
             // empty
             if (go->metasprite) {
-                bool sprite = spritemanager_add_metasprite(go->metasprite);
-                if (!sprite) {
-                    return false;
-                }
+                // bool sprite = spritemanager_add_metasprite(go->metasprite);
+                // if (!sprite) {
+                //     return false;
+                // }
             }
-            go_manager.pool[i] = go;
+            go_manager.pool[i] = *go;
 
             return true;
         }
@@ -23,8 +23,8 @@ bool go_spawn(GameObject* go) {
 
 void go_pool_update() {
     for (int i = 0; i < gameobject_count; i++) {
-        if (go_manager.pool[i]) {
-            go_update(go_manager.pool[i]);
+        if (go_manager.pool[i].isAlive) {
+            go_update(&go_manager.pool[i]);
         }
     }
 }
@@ -41,7 +41,7 @@ void position_add_and_limit(Vector2* lhs, const Vector2* rhs) {
 }
 
 void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
-    Rect* box = &go->metasprite->box;
+    Rect* box = &go->box;
 
     world_coord metatile_x1 = box->x >> 4;
     world_coord metatile_x2 = (box->x + box->w-1) >> 4;
@@ -54,7 +54,8 @@ void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
         for (int i = metatile_x1; i <= metatile_x2; i++) {
             Metatile meta = metamap_metatile_get2(go_manager.colision_map, i, metatile_y2);
             if (meta > META_SKY) {
-                go->pos.y.position = go->pos.y.position & ~0xf; // go up
+                uint8_t offset = (box->y + box->h) - (metatile_y2 << 4);
+                go->pos.y.position -= offset; // go up
                 go->isGrounded = true;
                 break;
             }
@@ -64,7 +65,8 @@ void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
         for (int i = metatile_x1; i <= metatile_x2; i++) {
             Metatile meta = metamap_metatile_get2(go_manager.colision_map, i, metatile_y1);
             if (meta > META_SKY) {
-                go->pos.y.position = (go->pos.y.position + 16) & ~0xf; // go down
+                uint8_t offset = (metatile_y1 + 1 << 4) - (box->y);
+                go->pos.y.position += offset; // go down
                 break;
             }
         }
@@ -78,7 +80,8 @@ void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
             for (int i = metatile_y1; i <= metatile_y2; i++) {
             Metatile meta = metamap_metatile_get2(go_manager.colision_map, metatile_x2, i);
             if (meta > META_SKY) {
-                go->pos.x.position = go->pos.x.position & ~0xf; // go left
+                uint8_t offset = (box->x + box->w) - (metatile_x2 << 4);
+                go->pos.x.position -= offset; // go left
                 break;
             }
         }
@@ -87,7 +90,8 @@ void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
         for (int i = metatile_y1; i <= metatile_y2; i++) {
             Metatile meta = metamap_metatile_get2(go_manager.colision_map, metatile_x1, i);
             if (meta > META_SKY) {
-                go->pos.x.position = (go->pos.x.position + 16) & ~0xf; // go right
+                uint8_t offset = (metatile_x1 + 1 << 4) - (box->x);
+                go->pos.x.position += offset; // go right
                 break;
             }
         }
@@ -104,8 +108,12 @@ void go_update(GameObject* go) {
         return;
     }
 
+    if (go->custom_function) {
+        go->custom_function(go);
+    }
+
     if (go->metasprite) {
-        display_set_dirty_meta(go->metasprite);
+        display_set_dirty_meta(go);
     }
 
     world_coord old_x = go->pos.x.position;
@@ -127,15 +135,15 @@ void go_update(GameObject* go) {
     int16_t delta_x = go->pos.x.position - old_x;
     int8_t delta_y = go->pos.y.position - old_y;
 
-    go->metasprite->box.x = go->pos.x.position;
-    go->metasprite->box.y = go->pos.y.position;
+    go->box.x = go->pos.x.position;
+    go->box.y = go->pos.y.position;
     go_collision_tile(go, delta_x, delta_y);
 
-    go->metasprite->box.x = go->pos.x.position;
-    go->metasprite->box.y = go->pos.y.position;
+    go->box.x = go->pos.x.position;
+    go->box.y = go->pos.y.position;
 
     if (go->metasprite) {
-        display_set_dirty_meta(go->metasprite);
+        display_set_dirty_meta(go);
     }
 }
 

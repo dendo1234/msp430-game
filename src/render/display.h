@@ -41,5 +41,7 @@ world_coord display_get_camera_pos();
 
 color test_color_picker(world_coord x, uint8_t y); 
 
+struct GameObject;
+
 void display_set_dirty(Bounds* box);
-void display_set_dirty_meta(MetaSprite* meta);
+void display_set_dirty_meta(struct GameObject* meta);

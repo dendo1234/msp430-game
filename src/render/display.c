@@ -283,6 +283,6 @@ void display_set_dirty(Bounds* box) {
     sprite_set_dirty(display.dirty_8x8, box);
 }
 
-void display_set_dirty_meta(MetaSprite* meta) {
-    metasprite_set_dirty(display.dirty_8x8, meta);
+void display_set_dirty_meta(struct GameObject* go) {
+    metasprite_set_dirty(display.dirty_8x8, go);
 }

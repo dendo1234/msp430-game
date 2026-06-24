@@ -56,7 +56,7 @@ void main (void)
     PMM_setVCore(PMM_CORE_LEVEL_2);
     overclock();
 
-    // display_render_all();
+    display_render_all();
 
     sprite_manager.background = &metamap1;
     go_manager.colision_map = &metamap1;
@@ -83,20 +83,9 @@ void main (void)
 
         }
 
-        ADC_result joystick = adc_read();
-        if (!(P1IN & BIT2)) {
-            joystick.y = -128;
-        }
-        mario_move(joystick, !(P1IN & BIT3));
-
-
-        uint8_t camera_delta = go_calculate_camera_delta(&go_mario);
-        display_camera_add(camera_delta);
-
         go_pool_update();
 
         display_render_new_columns_metatilemap();
-        display_set_dirty_meta(&metasprite_mario);
         display_render_dirty_sprites();
 
         //Frame end

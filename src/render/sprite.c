@@ -10,7 +10,7 @@ bool sprite_check_inside(Rect* check, world_coord tile_x1, world_coord tile_x2) 
     return (x1 >= tile_x1 && x1 <= tile_x2) || (x2 >= tile_x1 && x2 <= tile_x2) || (x1 <= tile_x1 && x2 >= tile_x2);
 }
 
-void sprite_ret_copy(uint16_t* destination, Sprite* sprite, Bounds* src_box, Bounds* dst_box) {
+void sprite_ret_copy(uint16_t* destination, const Sprite* sprite, Bounds* src_box, Bounds* dst_box) {
     const color* data = (*sprite->data);
 
     destination += dst_box->y1;
@@ -41,6 +41,8 @@ void sprite_ret_copy(uint16_t* destination, Sprite* sprite, Bounds* src_box, Bou
     }
 };
 
+#include "gameobject.h"
+
 void sprite_render_dirty8x8(uint16_t* destination, world_coord tile_x1, uint8_t y) {
     world_coord tile_x2 = tile_x1 + 7;
     uint8_t tile_y1 = y & ~0x7;
@@ -53,20 +55,21 @@ void sprite_render_dirty8x8(uint16_t* destination, world_coord tile_x1, uint8_t 
     // render
 
     for (int i = 0; i < sprite_slots_count; i++) {
-        MetaSprite* meta_sprite = sprite_manager.sprite_slots[i];
+        GameObject* go = &go_manager.pool[i];
+        const MetaSprite* meta_sprite = go->metasprite;
 
-        if (!meta_sprite->render) {
+        if (!go->render) {
             continue;
         }
 
-        Rect* rect = &meta_sprite->box;
+        Rect* rect = &go->box;
         bool render_meta = sprite_check_inside(rect, tile_x1, tile_x2);
 
         if (render_meta) {
             uint8_t sprite_count = meta_sprite->sprite_count;
 
             for (int i = 0; i < sprite_count; i++) {
-                Sprite* sprite = &meta_sprite->sprites[i];
+                const Sprite* sprite = &meta_sprite->sprites[i];
                 if (!sprite->render) {
                     continue;
                 }
@@ -139,14 +142,15 @@ void sprite_set_dirty(uint8_t dirty[4][30], Bounds* box) {
     }
 }
 
-void metasprite_set_dirty(uint8_t dirty[4][30], MetaSprite* meta) {
+void metasprite_set_dirty(uint8_t dirty[4][30], GameObject* go) {
     world_coord camera_pos = display_get_camera_pos();
+    const MetaSprite* meta = go->metasprite;
     uint8_t sprite_count = meta->sprite_count;
 
-    world_coord meta_x1 = meta->box.x;
-    uint8_t meta_y1 = meta->box.y;
+    world_coord meta_x1 = go->box.x;
+    uint8_t meta_y1 = go->box.y;
     for (int i = 0; i < sprite_count; i++) {
-        Sprite* sprite = &meta->sprites[i];
+        const Sprite* sprite = &meta->sprites[i];
 
         world_coord x1 = meta_x1 + sprite->offset.x;
         world_coord x2 = x1 + 7;
@@ -164,12 +168,12 @@ void metasprite_set_dirty(uint8_t dirty[4][30], MetaSprite* meta) {
     }
 }
 
-bool spritemanager_add_metasprite(MetaSprite* meta) {
-    for (int i = 0; i < sprite_slots_count; i++) {
-        if (!sprite_manager.sprite_slots[i]) {
-            sprite_manager.sprite_slots[i] = meta;
-            return true;
-        }
-    }
-    return false;
-}
+// bool spritemanager_add_metasprite(const MetaSprite* meta) {
+//     for (int i = 0; i < sprite_slots_count; i++) {
+//         if (!sprite_manager.sprite_slots[i]) {
+//             sprite_manager.sprite_slots[i] = meta;
+//             return true;
+//         }
+//     }
+//     return false;
+// }
