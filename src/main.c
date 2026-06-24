@@ -10,6 +10,7 @@
 #include "mario.h"
 #include "render/display.h"
 #include "render/sprite_pool.h"
+#include "gospawner.h"
 
 const uint8_t MAIN_CLK_DIVIDER_POWER = 3; // 2^x
 const uint16_t FRAME_TARGET = (SMCLK_FREQUENCY/(1 << MAIN_CLK_DIVIDER_POWER))*0.016667; //60 fps
@@ -85,6 +86,8 @@ void main (void)
 
         go_pool_update();
 
+        spwaner_check(display_get_camera_pos());
+        
         display_render_new_columns_metatilemap();
         display_render_dirty_sprites();
 

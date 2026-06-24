@@ -40,7 +40,7 @@ void mario_move(GameObject* go) {
     }
     
     int32_t max_speed = 0x10000l;
-    if (P1IN & BIT3) {
+    if (!(P1IN & BIT3)) {
         max_speed = 0x28000l;
     }
 

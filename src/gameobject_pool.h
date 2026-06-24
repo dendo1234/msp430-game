@@ -2,4 +2,4 @@
 #include "gameobject.h"
 
 
-extern GameObject go_goomba_template;
+extern GameObject go_koopa_template;
