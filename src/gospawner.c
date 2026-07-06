@@ -72,16 +72,15 @@ GoSpawner spawner = {
 };
 
 void spwaner_check(world_coord camera_pos) {
-    for (int i = spawner.spawned; i < spawn_count; i++) {
-        if (spawner.spawn_position[i].x < camera_pos+256) {
-            spawner.list[i]->box.x = spawner.spawn_position[i].x;
-            spawner.list[i]->box.y = spawner.spawn_position[i].y;
-            spawner.list[i]->pos.x.position = spawner.spawn_position[i].x;
-            spawner.list[i]->pos.y.position = spawner.spawn_position[i].y;
-            go_spawn(spawner.list[i]);
-            spawner.spawned++;
-        } else {
+    while (spawner.spawned < spawn_count) {
+        if (spawner.spawn_position[spawner.spawned].x > camera_pos+256) {
             break;
         }
+        spawner.list[spawner.spawned]->box.x = spawner.spawn_position[spawner.spawned].x;
+        spawner.list[spawner.spawned]->box.y = spawner.spawn_position[spawner.spawned].y;
+        spawner.list[spawner.spawned]->pos.x.position = spawner.spawn_position[spawner.spawned].x;
+        spawner.list[spawner.spawned]->pos.y.position = spawner.spawn_position[spawner.spawned].y;
+        go_spawn(spawner.list[spawner.spawned]);
+        spawner.spawned++;
     }
 }

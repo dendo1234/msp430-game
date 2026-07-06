@@ -54,6 +54,13 @@ void main (void)
     int delta_time = 0;
     volatile uint16_t frame_max = 0;
 
+    volatile uint16_t go_time = 0;
+    volatile uint16_t go_max = 0;
+    volatile uint16_t columns_time = 0;
+    volatile uint16_t columns_max = 0;
+    volatile uint16_t sprite_time = 0;
+    volatile uint16_t sprite_max = 0;
+
     PMM_setVCore(PMM_CORE_LEVEL_2);
     overclock();
 
@@ -84,12 +91,18 @@ void main (void)
 
         }
 
+        go_time = TA0R;
         go_pool_update();
-
         spwaner_check(display_get_camera_pos());
+        go_time = TA0R - go_time;
         
+        columns_time = TA0R;
         display_render_new_columns_metatilemap();
+        columns_time = TA0R - columns_time;
+
+        sprite_time = TA0R;
         display_render_dirty_sprites();
+        sprite_time = TA0R - sprite_time;
 
         //Frame end
         WORK_LED_OFF;
@@ -97,6 +110,11 @@ void main (void)
         uint16_t frame_end = TA0R;
         uint16_t frame_duration = frame_end - frame_start;
         frame_max = frame_duration > frame_max ? frame_duration : frame_max;
+
+        go_max = go_time > go_max ? go_time : go_max;
+        columns_max = columns_time > columns_max ? columns_time : columns_max;
+        sprite_max = sprite_time > sprite_max ? sprite_time : sprite_max;
+
         if (frame_duration < FRAME_TARGET-100 && !(TA0CTL & TAIFG)) {
             SLEEP_LED_ON;
             __bis_SR_register(LPM0_bits + GIE); // enter low power mode

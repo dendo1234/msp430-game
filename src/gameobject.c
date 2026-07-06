@@ -47,6 +47,7 @@ void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
     world_coord metatile_x2 = (box->x + box->w-1) >> 4;
     uint8_t metatile_y1 = box->y >> 4;
     uint8_t metatile_y2 = (box->y + box->h-1) >> 4;
+    world_coord old_pos = go->pos.x.position;
 
     go->isGrounded = false;
     if (delta_y > 0) {
@@ -96,6 +97,10 @@ void go_collision_tile(GameObject* go, int16_t delta_x, int8_t delta_y) {
             }
         }
     }
+
+    if (go->pos.x.position > old_pos + 30) {
+        __no_operation();
+    }
 }
 
 void go_update_pos(GameObject* go) {
@@ -104,7 +109,7 @@ void go_update_pos(GameObject* go) {
 
 
 void go_update(GameObject* go) {
-    if (!go) {
+    if (!go || !go->isAlive) {
         return;
     }
 
@@ -134,6 +139,10 @@ void go_update(GameObject* go) {
 
     int16_t delta_x = go->pos.x.position - old_x;
     int8_t delta_y = go->pos.y.position - old_y;
+
+    if (delta_x > 30) {
+        __no_operation();
+    }
 
     go->box.x = go->pos.x.position;
     go->box.y = go->pos.y.position;

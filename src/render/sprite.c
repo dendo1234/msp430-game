@@ -130,12 +130,16 @@ void sprite_set_dirty(uint8_t dirty[4][30], Bounds* box) {
     if (coord_cull(box->x1, camera_pos)) {
         uint8_t tile_x = (box->x1 >> 3) - camera_tile_offset;
 
+        assert(tile_x >> 3 < 5);
+
         dirty[tile_x >> 3][y1] |= 1 << (tile_x & 0x7);
         dirty[tile_x >> 3][y2] |= 1 << (tile_x & 0x7);
     }
 
     if (coord_cull(box->x2, camera_pos)) {
         uint8_t tile_x = (box->x2 >> 3) - camera_tile_offset;
+
+        assert(tile_x >> 3 < 5);
 
         dirty[tile_x >> 3][y1] |= 1 << (tile_x & 0x7);
         dirty[tile_x >> 3][y2] |= 1 << (tile_x & 0x7);

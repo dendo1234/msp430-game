@@ -15,7 +15,8 @@ typedef struct {
     // One consequence is that since there can be more than 32 world tiles in view on the horizontal axis
     // (31 "full tiles" + 2 partial at the begining and end)
     // is that the last tile in view horizontaly is not tracked
-    uint8_t dirty_8x8[4][30];
+    // later note: access to tile "33" would happen anyway causing buffer overflow bugs if dirty_8x8[4][30]
+    uint8_t dirty_8x8[5][30];
 } display_data;
 
 
