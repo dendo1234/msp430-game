@@ -4,6 +4,9 @@ Developed for the MSP-EXP430F5529LP, this is an atempt to make a game for such l
 ## results
 trust me bro: worst case, this gets a frame time of 11,1 ms at 16 MiHz MCLK and 8 MiHz SMCLK. 11,1 is lower then 16,6 so we get 60 fps.
 
+<img width="504" height="378" alt="20260706_235855" src="https://github.com/user-attachments/assets/e9ea69c3-b821-4bb4-8a9a-03d0fa8410cb" />
+
+
 ## how is the rendering done
 ### math
 Before we begin, a bit of math: a 256x240 pixel display has 61440 pixels. The pixel format used is the RGB565, which uses 2 bytes per pixels or 122880 bytes per frame. If we want 60 fps, we gotta have a bandwidth of 7.372.800 bytes/second or 58.982.400 bits/seconds or 59 Mbit/s. For the unitiated on serial comunication, that means we would need at least a 59 MHz clock. A pretty fast clock. Maybe not impossible to achive with this MCU, but defenetly out of recomended specs. For reference, the main system clock MCLK, which is not the same clock as the serial comunication clock, althougth similar, can only be up to 25 MHz.
