@@ -53,6 +53,8 @@ void main (void)
     uint16_t frame_start = 0;
     int delta_time = 0;
     volatile uint16_t frame_max = 0;
+    volatile uint16_t times[256];
+    uint8_t current_time = 0;
 
     volatile uint16_t go_time = 0;
     volatile uint16_t go_max = 0;
@@ -110,6 +112,7 @@ void main (void)
         uint16_t frame_end = TA0R;
         uint16_t frame_duration = frame_end - frame_start;
         frame_max = frame_duration > frame_max ? frame_duration : frame_max;
+        times[current_time++] = frame_duration;
 
         go_max = go_time > go_max ? go_time : go_max;
         columns_max = columns_time > columns_max ? columns_time : columns_max;
